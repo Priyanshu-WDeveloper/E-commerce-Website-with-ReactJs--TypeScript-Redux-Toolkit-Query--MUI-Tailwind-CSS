@@ -38,7 +38,7 @@ const TopSellers = () => {
     );
   };
   return (
-    <Box sx={{ boxShadow: 2 }} className=" bg-white p-5   w-[21rem] rounded ">
+    <Box sx={{ boxShadow: 2 }} className=" bg-white p-5 w-[21rem] rounded ">
       <Typography sx={{ fontWeight: "bold", mb: "10px" }} variant="h5">
         Top Sellers
       </Typography>

@@ -10,6 +10,10 @@ import Pagenotfound from "./pages/Pagenotfound";
 // import Sidebar from "./pages/Sidebar";
 import MainContent from "./pages/MainContent";
 import ProductPage from "./pages/ProductPage";
+import Analytics from "./pages/Analytics";
+import Cart from "./components/Cart";
+import Checkout from "./components/Checkout";
+import Address from "./components/Address";
 function App() {
   return (
     <Router>
@@ -17,12 +21,19 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/analytics" element={<Analytics />} />
         <Route path="/menu" element={<Menu />}>
           <Route index element={<MainContent />} />
           <Route path="product" element={<MainContent />} />
           <Route path="product/:id" element={<ProductPage />} />
           {/* </Route> */}
         </Route>
+        <Route path="/checkout" element={<Checkout />}>
+          <Route index element={<Cart />} />
+          <Route path="cart" element={<Cart />} />
+          <Route path="address" element={<Address />} />
+        </Route>
+
         <Route path="*" element={<Pagenotfound />} />
       </Routes>
     </Router>

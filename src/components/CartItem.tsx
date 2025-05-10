@@ -1,87 +1,62 @@
 import { Box, Button, Typography } from "@mui/material";
-import { FC, useEffect, useState } from "react";
-import { ProductData } from "../pages/MainContent";
-import { useDispatch, useSelector } from "react-redux";
+import { FC } from "react";
+import { useDispatch } from "react-redux";
 import { changeQuantity } from "../reducers/cart";
-import { RootState } from "../app/store";
-interface Product {
-  id: number;
-  title?: string;
-  thumbnail?: string;
-  price?: number;
-}
+// import { DecimationAlgorithm } from "chart.js";
+import { CartItemProps } from "../types/ProductTypes";
 
-interface CartItemProps {
-  data: {
-    productId: number;
-    quantity: number;
-  };
-}
-const CartItem: FC<CartItemProps> = (props) => {
-  const { productId, quantity } = props.data;
+const CartItem: FC<CartItemProps> = ({ data: detail }) => {
+  // console.log(data.title);
+  // console.log("detail", detail);
+
+  // const { productId, quantity } = props.data;
 
   const dispatch = useDispatch();
   // console.log("productId", productId);
   // console.log("quantity", quantity);
-  const [detail, setDetail] = useState<Product | null>(null);
-  let pricee;
-  useEffect(() => {
-    const findDetail =
-      ProductData?.find((product: Product) => product?.id === productId) ||
-      null; //!filterX find_/
+  // const [detail, setDetail] = useState<Product | null>(null);
+  // let pricee;
+  // useEffect(() => {
+  //   const findDetail =
+  //     ProductData?.find((product: Product) => product?.id === productId) ||
+  //     null; //!filterX find_/
 
-    setDetail(findDetail);
-    console.log("findDetail", findDetail);
-    console.log("detail", detail?.title);
+  //   setDetail(findDetail);
+  //   // console.log("findDetail", findDetail);
+  //   // console.log("detail", detail?.title);
 
-    // if (!detail) {
-    //   return <Box>Loading product...</Box>;
-    // }
-  }, [productId]);
+  //   // if (!detail) {
+  //   //   return <Box>Loading product...</Box>;
+  //   // }
+  // }, [productId]);
   const handleMinus = () => {
     dispatch(
       changeQuantity({
-        productId: productId,
-        quantity: quantity - 1,
+        productId: detail.id,
+        quantity: detail.quantity - 1,
       })
     );
   };
   const handlePlus = () => {
     dispatch(
       changeQuantity({
-        productId: productId,
-        quantity: quantity + 1,
+        productId: detail.id,
+        quantity: detail.quantity + 1,
       })
     );
   };
-  const carts = useSelector((store: RootState) => store.cart.items);
-  console.log(carts);
-
-  const totalPrice = carts.reduce((acc: number, item) => {
-    // if (!detail) return 0;
-    console.log(detail?.price ?? 0);
-    console.log(item.quantity);
-    return acc + (detail?.price ?? 0) * item.quantity;
-  }, 0);
-  console.log(totalPrice);
-
-  // const cartTotalPrice = carts.reduce((acc: number, item) => {
-  //   const p = ProductData.find((pd: Product) => pd.id === item.productId);
-  //   return acc + (p?.price ?? 0) * item.quantity;
-  // }, 0);
-  // console.log(cartTotalPrice);
 
   return (
     <>
       <Box>
         {" "}
-        <Box className="flex justify-between items-center bg-slate-600 text-white border-b-2 border-slate-700 gap-5 mb-2 p-2 w-[315px] rounded-md ">
+        <Box className="flex justify-between items-center bg-slate-600 text-white border-b-2 border-slate-700 gap-5 mb-2 p-2  rounded-md ">
           <figure>
-            <img src={detail?.thumbnail} alt={detail?.title} className="w-25" />
+            <img src={detail?.image} alt={detail?.title} className="w-25" />
           </figure>
           <Typography variant="body2">{detail?.title}</Typography>
           <Typography variant="body2">
-            ${((detail?.price ?? 0) * quantity).toFixed(2)}
+            ${((detail?.price ?? 0) * detail.quantity).toFixed(2)}
           </Typography>
           <Box className="w-40  flex justify-center gap-2">
             <Button
@@ -99,7 +74,7 @@ const CartItem: FC<CartItemProps> = (props) => {
               {" "}
               -
             </Button>
-            <span>{quantity}</span>
+            <span>{detail.quantity} </span>
             <Button
               sx={{
                 width: "24px",
@@ -117,7 +92,6 @@ const CartItem: FC<CartItemProps> = (props) => {
           </Box>
         </Box>
       </Box>
-      <Box>{/* <span>{totalPrice}</span> */}</Box>
     </>
   );
 };

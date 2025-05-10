@@ -4,34 +4,47 @@ import {
   Card,
   CardContent,
   CardMedia,
-  ImageList,
-  ImageListItem,
-  ImageListItemBar,
-  Stack,
   Typography,
 } from "@mui/material";
 import { FC } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { addToCart } from "../reducers/cart";
-import { RootState } from "../app/store";
+// import { RootState } from "../app/store";
+import { useToast } from "../helpers/toasts/useToast";
+import { Product } from "../types/ProductTypes";
 
-interface BookCardProps {
-  id: string;
-  title: string;
-  image: string;
-  price: string;
-}
-const Bookcard: FC<BookCardProps> = ({ id, title, image, price, loading }) => {
-  const carts = useSelector((store: RootState) => store.cart.items);
-  // console.log(carts);
+const Bookcard = (props) => {
+  console.log(props);
+  const {
+    id,
+    title,
+    image,
+    price,
+    thumbnail,
+    brand,
+    returnPolicy,
+    discountPercentage,
+  } = props.data;
+  console.log(title);
 
+  // const carts = useSelector((store: RootState) => store.cart.items);
+
+  const showToast = useToast();
+  // const showError = useErrorToast();
   const dispatch = useDispatch();
   const handleAddToCart = () => {
+    showToast("Added to Cart Successfully");
     dispatch(
       addToCart({
-        productId: id,
-        quantity: 1,
+        id,
+        title,
+        image,
+        price,
+        brand,
+        returnPolicy,
+        discountPercentage,
+        thumbnail,
       })
     );
   };
@@ -98,7 +111,7 @@ const Bookcard: FC<BookCardProps> = ({ id, title, image, price, loading }) => {
             >
               <CardMedia
                 component="img"
-                image={image}
+                image={thumbnail}
                 alt={name}
                 sx={{
                   width: "100%",

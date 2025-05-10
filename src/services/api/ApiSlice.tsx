@@ -4,6 +4,7 @@ type CommonResponseType = {
   statusCode: number;
   message: string;
   products: [];
+  total: number;
   // data: {
   //   products?: any;
   // };
@@ -14,10 +15,17 @@ export const apiSlice = createApi({
   endpoints: (builder) => ({
     getProductData: builder.query<
       CommonResponseType & { data: any },
-      { limit?: number; skip?: number; search?: string; category?: string }
+      {
+        limit?: number;
+        skip?: number;
+        search?: string;
+        category?: string;
+        sort?: string;
+        order?: string;
+      }
       // { limit?: number; skip?: number; search?: string }
     >({
-      query: ({ skip, limit, search, category }) => {
+      query: ({ skip, limit, search, category, sort, order }) => {
         // let url = `?limit=${limit}&skip=${skip}&search?q=${search}`; //? {()}
         // return {                   //? {}
         //   url: url,
@@ -52,6 +60,7 @@ export const apiSlice = createApi({
           const params = [];
           if (limit) params.push(`limit=${limit}`);
           if (skip) params.push(`skip=${skip}`);
+          if ((sort, order)) params.push(`sortBy=${sort}&order=${order}`);
           // if (search) params.push(`search?q=${search}`);
           if (params.length > 0) url += `?${params.join("&")}`;
         }

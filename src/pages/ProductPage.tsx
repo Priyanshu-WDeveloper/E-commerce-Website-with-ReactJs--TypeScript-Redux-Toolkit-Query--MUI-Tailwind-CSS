@@ -26,7 +26,7 @@ interface Product {
 }
 const ProductPage = () => {
   const { id } = useParams<{ id: string }>();
-  console.log("Product ID", id);
+  // console.log("Product ID", id);
 
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null); //! null
@@ -92,7 +92,7 @@ const ProductPage = () => {
 
       {/* <Box className="w-[100%] h-[30%] p-5 mt-6"> */}
       <Box className="w-[100%]  p-5 mt-6">
-        {/* <Button
+        <Button
           variant="contained"
           sx={{
             backgroundColor: "black",
@@ -105,7 +105,7 @@ const ProductPage = () => {
           className="mb-5 px-4 py-2 bg-black text-white rounded-full"
         >
           Back
-        </Button> */}
+        </Button>
         <Grid container spacing={1} mt={2}>
           <Grid item xs={12} md={6}>
             <Card

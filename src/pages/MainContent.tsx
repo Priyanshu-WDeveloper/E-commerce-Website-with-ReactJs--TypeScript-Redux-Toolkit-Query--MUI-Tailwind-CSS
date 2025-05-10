@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 // import { RootState } from "./app/store"
 import { useDispatch, useSelector } from "react-redux";
@@ -7,28 +6,18 @@ import {
   Box,
   Button,
   CircularProgress,
-  Container,
   Divider,
   Drawer,
-  ImageList,
   List,
   ListItem,
   ListItemButton,
-  ListItemIcon,
-  ListItemText,
 } from "@mui/material";
 import BubbleChartIcon from "@mui/icons-material/BubbleChart";
 import Bookcard from "./Bookcard";
 
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 import { RootState } from "../app/store";
 import Sidebar from "./Sidebar";
-import {
-  useGetSimpleDataQuery,
-  useLazyGetProductDataQuery,
-  useLazyGetSimpleDataQuery,
-} from "../services/api/ApiSlice";
+import { useLazyGetProductDataQuery } from "../services/api/ApiSlice";
 
 // interface Product {
 //     category: string;
@@ -39,6 +28,7 @@ import {
 // }
 
 export let ProductData: any[] = [];
+export let TotalData;
 const MainContent = () => {
   const [products, setProducts] = useState<any[]>([]);
   const [filter, setFilter] = useState("all");
@@ -63,6 +53,9 @@ const MainContent = () => {
   // }
   const limit = itemPerPage;
   const skip = (currentPage - 1) * limit;
+  const sort = "title";
+  const order = "asc";
+  // const skip = (currentPage - 1) * limit;
   // const category = selectedCategory;
   // console.log("data", data);
 
@@ -77,18 +70,23 @@ const MainContent = () => {
         console.log("API Response for search:", res, keyword);
       });
     } else {
-      trigger({ limit, skip });
+      trigger({ limit, skip, sort, order });
+      // trigger({ limit, skip, sort, order }).then((res) =>
+      //   console.log("ress", res)
+      // );
     }
-  }, [trigger, limit, skip, selectedCategory, keyword]);
+  }, [trigger, limit, skip, selectedCategory, keyword, sort, order]);
   useEffect(() => {
     if (data && Array.isArray(data.products)) {
       setProducts(data.products);
       ProductData = data.products;
+      TotalData = data.total;
     } else {
       setProducts([]);
       ProductData = [];
     }
   }, [data]);
+
   //   useEffect(() => {
   //     let url = `https://dummyjson.com/products?limit=${itemPerPage}&skip=${(currentPage - 1) * itemPerPage}`
   //     if (keyword) {
@@ -158,6 +156,7 @@ const MainContent = () => {
     //   });
     // }
     // console.log(filteredProducts);
+
     if (minPrice !== undefined) {
       filteredProducts = filteredProducts.filter(
         (product) => product.price >= minPrice
@@ -189,6 +188,7 @@ const MainContent = () => {
 
   const totalProducts = 100;
   const totalPages = Math.ceil(totalProducts / itemPerPage);
+  // const totalPages = Math.ceil(TotalData / itemPerPage);
   const handlePageChange = (page: number) => {
     if (page > 0 && page <= totalPages) {
       setCurrentPage(page);
@@ -326,14 +326,15 @@ const MainContent = () => {
 
                 {filteredProducts.map((product) => (
                   <Bookcard
-                    key={product.id}
-                    id={product.id}
-                    title={product.title || ""}
-                    // image={product.images[0]}
-                    image={product.thumbnail || ""}
-                    // image={...products, thumbnail: `https://picsum.photos/seed/${product.id}/200/300`}
-                    price={product.price || 0}
+                    // key={product.id}
+                    // id={product.id}
+                    // title={product.title || ""}
+                    // // image={product.images[0]}
+                    // image={product.thumbnail || ""}
+                    // // image={...products, thumbnail: `https://picsum.photos/seed/${product.id}/200/300`}
+                    // price={product.price || 0}
                     // loading={loading}
+                    data={product}
                   />
                 ))}
               </Box>

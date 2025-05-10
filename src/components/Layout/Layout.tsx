@@ -1,9 +1,11 @@
-import React from "react";
+import { ReactNode } from "react";
 import Footer from "./Footer";
 import Header from "./Header";
 import { Box } from "@mui/material";
-
-const Layout = ({ children }) => {
+interface LayoutProps {
+  children: ReactNode;
+}
+const Layout = ({ children }: LayoutProps) => {
   return (
     <Box
       sx={{
@@ -18,7 +20,7 @@ const Layout = ({ children }) => {
         sx={{
           flexGrow: 1,
           marginTop: 0, // Remove any top margin
-          position: "relative",
+          // position: "relative",
         }}
       >
         {children}

@@ -18,10 +18,11 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../../styles/HeadStyles.css";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { useLazyGetCategoryListQuery } from "../../services/api/ApiSlice";
+// import { useLazyGetCategoryListQuery } from "../../services/api/ApiSlice";
 import { setSelectedCategory } from "../../reducers/FilterSlice";
 import LongMenu from "../LongMenu";
 import { CategoryResponse } from "../../types/productTypes";
+import { useLazyGetCategoryListQuery } from "../../services/ProductData";
 
 const Header = () => {
   const location = useLocation();

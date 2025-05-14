@@ -12,10 +12,11 @@ import {
   Rating,
   Typography,
 } from "@mui/material";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ProductData } from "../types/productTypes";
+import axios from "axios";
+// import { useLazyGetProductDataByIdQuery } from "../services/ProductData";
 
 const ProductPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,18 +24,26 @@ const ProductPage = () => {
 
   const navigate = useNavigate();
   const [product, setProduct] = useState<ProductData | null>(null); //! null
-
+  // const [productData] = useLazyGetProductDataByIdQuery();
+  // const [trigger, { data: response }] = useLazyGetProductDataByIdQuery();
+  // console.log(response);
+  // useEffect(() => {
+  //   if (id) {
+  //     trigger({ id });
+  //   }
+  //   // trigger(id ? { id } : skipToken);
+  // }, [trigger, id]);
   useEffect(() => {
-    // if (id) {
-    //   axios
-    //     .get<Product>(`https://dummyjson.com/products/${id}`)
-    //     .then((response) => {
-    //       setProduct(response.data);
-    //     })
-    //     .catch((error) => {
-    //       console.log(`Error fectching Product Data: ${error}`);
-    //     });
-    // }
+    //   // if (id) {
+    //   //   axios
+    //   //     .get<Product>(`https://dummyjson.com/products/${id}`)
+    //   //     .then((response) => {
+    //   //       setProduct(response.data);
+    //   //     })
+    //   //     .catch((error) => {
+    //   //       console.log(`Error fectching Product Data: ${error}`);
+    //   //     });
+    //   // }
     (async () => {
       try {
         if (id) {
@@ -42,14 +51,25 @@ const ProductPage = () => {
             `https://dummyjson.com/products/${id}`
           );
           setProduct(response.data);
-          // console.log(response);
+          console.log(response);
         }
       } catch (error) {
         console.log(`Error fectching Product Data: ${error}`);
       }
     })();
   }, [id]);
-
+  // const getProductData = async () => {
+  //   try {
+  //     const response = await productData({ id } as { id: string });
+  //     console.log(response.data);
+  //     setProduct(response.data);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   getProductData();
+  // }, []);
   const [open, setOpen] = useState(true);
   const handleClose = () => {
     setOpen(false);

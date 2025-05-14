@@ -19,6 +19,10 @@ import { RootState } from "../app/store";
 import Sidebar from "./Sidebar";
 import { useLazyGetProductDataQuery } from "../services/api/ApiSlice";
 import { Product } from "../types/productTypes";
+import {
+  useGetCategoryListQuery,
+  useGetProductDataQuery,
+} from "../services/ProductData";
 
 // interface Product {
 //     category: string;
@@ -48,6 +52,21 @@ const MainContent = () => {
   // if (!isLoading && data) {
   // console.log(data);
   // }
+  const limmiter = 10;
+  const skipp = 0;
+
+  const {
+    data: categoriesNewData,
+    isLoading: isNewCategoriesLoading,
+    isError: isNewCategoriesError,
+    error,
+  } = useGetProductDataQuery({ limit: limmiter, skip: skipp });
+
+  // Debug information
+  // console.log("categoriesNewData:", categoriesNewData);
+  // console.log("isLoading:", isNewCategoriesLoading);
+  // console.log("isError:", isNewCategoriesError);
+  // console.log("error:", error);
   const limit = itemPerPage;
   const skip = (currentPage - 1) * limit;
   const sort = "title";

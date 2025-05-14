@@ -15,7 +15,12 @@ import {
   setSelectedCategory,
 } from "../reducers/FilterSlice";
 import { RootState } from "../app/store";
-import { useLazyGetCategoryListQuery } from "../services/api/ApiSlice";
+// import { useLazyGetCategoryListQuery } from "../services/api/ApiSlice";
+import {
+  useGetCategoryListQuery,
+  useLazyGetCategoryListQuery,
+} from "../services/ProductData";
+import axios from "axios";
 
 // Predefined keywords for quick filtering
 const KEYWORDS = ["apple", "watch", "shoes", "shirt"];
@@ -47,8 +52,45 @@ const Sidebar = () => {
   // Setup API query hook
   const [fetchCategories, { data: categoriesData, isLoading }] =
     useLazyGetCategoryListQuery();
-  // console.log(categoriesData);
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        // setLoading(true);
+        // Make a simple GET request without a body
+        const response = await axios.get(
+          "http://localhost:3500/api/dummy/products"
+        );
+        console.log(response);
+
+        // if (response.data && response.data.products) {
+        //   setProducts(response.data.products);
+        // }
+        // setError(null);
+      } catch (error) {
+        console.log(error);
+        // setError("Failed to fetch products");
+      }
+      // finally {
+      //   setLoading(false);
+      // }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const {
+    data: categoriesNewData,
+    isLoading: isNewCategoriesLoading,
+    isError: isNewCategoriesError,
+    error,
+  } = useGetCategoryListQuery();
+
+  // Debug information
+  // console.log("categoriesNewData:", categoriesNewData);
+  // console.log("isLoading:", isNewCategoriesLoading);
+  // console.log("isError:", isNewCategoriesError);
+  // console.log("error:", error);
   // Get random categories for display - memoized to prevent recalculation
   const randomCategories = useMemo(() => {
     if (

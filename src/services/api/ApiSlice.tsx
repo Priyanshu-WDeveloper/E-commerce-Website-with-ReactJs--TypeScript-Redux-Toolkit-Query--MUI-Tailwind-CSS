@@ -1,20 +1,27 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import {
+  CategoryResponse,
+  Product,
+  ProductData,
+  ProductsResponse,
+} from "../../types/productTypes";
 const URL = "https://dummyjson.com/products";
 type CommonResponseType = {
   statusCode: number;
   message: string;
-  products: [];
+  products: Product[];
   total: number;
   // data: {
   //   products?: any;
   // };
 };
+
 export const apiSlice = createApi({
   reducerPath: "apiSlice",
   baseQuery: fetchBaseQuery({ baseUrl: URL }),
   endpoints: (builder) => ({
     getProductData: builder.query<
-      CommonResponseType & { data: any },
+      CommonResponseType & { data: ProductsResponse },
       {
         limit?: number;
         skip?: number;
@@ -60,7 +67,7 @@ export const apiSlice = createApi({
           const params = [];
           if (limit) params.push(`limit=${limit}`);
           if (skip) params.push(`skip=${skip}`);
-          if ((sort, order)) params.push(`sortBy=${sort}&order=${order}`);
+          if (sort && order) params.push(`sortBy=${sort}&order=${order}`);
           // if (search) params.push(`search?q=${search}`);
           if (params.length > 0) url += `?${params.join("&")}`;
         }
@@ -72,7 +79,7 @@ export const apiSlice = createApi({
       },
     }),
     getProductDataById: builder.query<
-      CommonResponseType & { data: any },
+      CommonResponseType & { data: ProductData },
       { id: string }
     >({
       query: ({ id }) => ({
@@ -80,19 +87,25 @@ export const apiSlice = createApi({
         method: "GET",
       }),
     }),
-    getSimpleData: builder.query<CommonResponseType & { data: any }, void>({
+    getSimpleData: builder.query<
+      CommonResponseType & { data: ProductsResponse },
+      void
+    >({
       query: () => {
         return { url: URL, method: "GET" };
       },
     }),
-    getCategoryList: builder.query<CommonResponseType & { data: any }, void>({
+    getCategoryList: builder.query<
+      CommonResponseType & { data: CategoryResponse },
+      void
+    >({
       query: () => ({
         url: `/category-list`,
         method: "GET",
       }),
     }),
     getProductDataByCategory: builder.query<
-      CommonResponseType & { data: any },
+      CommonResponseType & { data: ProductsResponse },
       string
     >({
       query: (category) => ({

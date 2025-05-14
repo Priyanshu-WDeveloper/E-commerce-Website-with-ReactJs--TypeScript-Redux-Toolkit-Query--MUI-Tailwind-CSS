@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 // import MainContainer from "../../layout/MainContainer";
 import { styled } from "@mui/material/styles";
@@ -131,44 +130,44 @@ const Analytics = () => {
       },
     ],
   };
-  const graphPostsData = {
-    labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
-    datasets: [
-      {
-        label: "Posts",
-        data: [
-          "10",
-          "20",
-          "25",
-          "15",
-          "50",
-          "10",
-          "20",
-          "25",
-          "15",
-          "50",
-          "20",
-          "25",
-        ],
-        borderColor: "#ed5f00",
-        backgroundColor: "#ed5f00",
-        color: "#FFFFF",
-      },
-    ],
-  };
+  // const graphPostsData = {
+  //   labels: [
+  //     "Jan",
+  //     "Feb",
+  //     "Mar",
+  //     "Apr",
+  //     "May",
+  //     "Jun",
+  //     "Jul",
+  //     "Aug",
+  //     "Sep",
+  //     "Oct",
+  //     "Nov",
+  //     "Dec",
+  //   ],
+  //   datasets: [
+  //     {
+  //       label: "Posts",
+  //       data: [
+  //         "10",
+  //         "20",
+  //         "25",
+  //         "15",
+  //         "50",
+  //         "10",
+  //         "20",
+  //         "25",
+  //         "15",
+  //         "50",
+  //         "20",
+  //         "25",
+  //       ],
+  //       borderColor: "#ed5f00",
+  //       backgroundColor: "#ed5f00",
+  //       color: "#FFFFF",
+  //     },
+  //   ],
+  // };
   return (
     <Container>
       <Button

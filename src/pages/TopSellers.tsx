@@ -7,28 +7,45 @@ interface Author {
   isFollowing: boolean;
   image: string;
 }
+interface AuthorData {
+  name: {
+    first: string;
+    last: string;
+  };
+  picture: {
+    medium: string;
+  };
+}
+
 const TopSellers = () => {
   const [authors, setAuthors] = useState<Author[]>([]);
-
+  // const [loading, setLoading] = useState(true);
   useEffect(() => {
     try {
       (async () => {
         const response = await axios.get(
           "https://randomuser.me/api/?results=5"
         );
-        // console.log(response.data);
         const data = response.data;
 
-        const authorsData = data.results.map((user) => ({
-          name: `${user.name.first} ${user.name.last}`,
-          isFollowing: false,
-          image: user.picture.medium,
-        }));
+        const authorsData = data.results.map((user: AuthorData) => {
+          // user is a single object of type AuthorData, not an array
+
+          return {
+            name: `${user.name.first} ${user.name.last}`,
+            isFollowing: false,
+            image: user.picture.medium,
+          };
+        });
         setAuthors(authorsData);
       })();
     } catch (error) {
       console.log("Error Fetching Products", error);
+      // setLoading(false);
     }
+    // finally {
+    //   setLoading(false);
+    // }
   }, []);
   const handleFollowClick = (index: number) => {
     setAuthors((prevAuther) =>
@@ -37,6 +54,9 @@ const TopSellers = () => {
       )
     );
   };
+  // loading ? (
+  //   <Typography>Loading...</Typography>
+  // ) :
   return (
     <Box sx={{ boxShadow: 2 }} className=" bg-white p-5 w-[21rem] rounded ">
       <Typography sx={{ fontWeight: "bold", mb: "10px" }} variant="h5">
@@ -59,12 +79,11 @@ const TopSellers = () => {
               sx={{
                 backgroundColor: author.isFollowing ? "red" : "black",
                 color: "white",
+                ":hover": {
+                  backgroundColor: author.isFollowing ? "red" : "black",
+                  color: "white",
+                },
               }}
-              className={`py-1 px-3 rounded ${
-                author.isFollowing
-                  ? "bg-red-500 text-white"
-                  : "bg-black text-white"
-              }`}
             >
               {author.isFollowing ? "Unfollow" : "Follow"}
             </Button>

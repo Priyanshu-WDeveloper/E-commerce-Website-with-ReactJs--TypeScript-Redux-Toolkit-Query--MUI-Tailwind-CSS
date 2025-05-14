@@ -24,10 +24,10 @@ const KEYWORDS = ["apple", "watch", "shoes", "shirt"];
 const CATEGORIES_TO_SHOW = 4;
 
 // Utility function for debouncing
-const useDebounce = (callback, delay) => {
+const useDebounce = <T,>(callback: (arg: T) => void, delay: number) => {
   const debouncedFn = useCallback(
-    (...args) => {
-      const handler = setTimeout(() => callback(...args), delay);
+    (arg: T) => {
+      const handler = setTimeout(() => callback(arg), delay);
       return () => clearTimeout(handler);
     },
     [callback, delay]
@@ -47,10 +47,16 @@ const Sidebar = () => {
   // Setup API query hook
   const [fetchCategories, { data: categoriesData, isLoading }] =
     useLazyGetCategoryListQuery();
+  // console.log(categoriesData);
 
   // Get random categories for display - memoized to prevent recalculation
   const randomCategories = useMemo(() => {
-    if (!categoriesData || categoriesData.length === 0) return [];
+    if (
+      !categoriesData ||
+      !Array.isArray(categoriesData) ||
+      categoriesData.length === 0
+    )
+      return [];
 
     // Create a copy to avoid mutating the original
     const shuffled = [...categoriesData];
@@ -71,22 +77,25 @@ const Sidebar = () => {
 
   // Event handlers with debounce for expensive operations
   const updateMinPrice = useCallback(
-    (value) => {
+    (value: string) => {
+      // console.log(value);
+
       dispatch(setMinPrice(value ? parseFloat(value) : undefined));
     },
     [dispatch]
   );
 
   const updateMaxPrice = useCallback(
-    (value) => {
+    (value: string) => {
+      // console.log(value);
       dispatch(setMaxPrice(value ? parseFloat(value) : undefined));
     },
     [dispatch]
   );
 
   // Debounced handlers to prevent rapid consecutive dispatches
-  const debouncedUpdateMinPrice = useDebounce(updateMinPrice, 300);
-  const debouncedUpdateMaxPrice = useDebounce(updateMaxPrice, 300);
+  const debouncedUpdateMinPrice = useDebounce<string>(updateMinPrice, 300);
+  const debouncedUpdateMaxPrice = useDebounce<string>(updateMaxPrice, 300);
 
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -122,7 +131,9 @@ const Sidebar = () => {
   }, [dispatch]);
 
   // Memoized handler for search query to prevent frequent re-renders
-  const handleSearchQueryChange = useDebounce((value) => {
+  const handleSearchQueryChange = useDebounce<string>((value: string) => {
+    // console.log(value);
+
     dispatch(setSearchQuery(value));
   }, 300);
 
@@ -132,7 +143,7 @@ const Sidebar = () => {
       return <Typography>Loading categories...</Typography>;
     }
 
-    return randomCategories.map((category, index) => (
+    return randomCategories.map((category) => (
       <FormControl key={category} component="fieldset" fullWidth>
         <RadioGroup name={`category-group-${category}`}>
           <FormControlLabel
@@ -154,7 +165,7 @@ const Sidebar = () => {
 
   // Memoize keyword buttons to prevent unnecessary re-renders
   const keywordButtons = useMemo(() => {
-    return KEYWORDS.map((keyword, index) => (
+    return KEYWORDS.map((keyword) => (
       <Button
         key={keyword}
         variant="outlined"

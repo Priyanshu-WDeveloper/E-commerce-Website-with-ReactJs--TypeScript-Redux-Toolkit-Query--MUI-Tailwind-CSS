@@ -20,7 +20,7 @@ const cartSlice = createSlice({
       const existingItem = state.items.find((i) => i.productId === item.id);
 
       if (existingItem) {
-        existingItem.quantity += item.quantity || 1; // added quantity may be users choice or default
+        existingItem.quantity += item.quantity || 1; // added quantity may be users choice or default //* ! tells typescript that quantity is not null
         // existingItem.quantity += 1;
       } else {
         // state.items.push(item);

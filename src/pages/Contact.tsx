@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import * as Yup from "yup";
+import { useFormik } from "formik";
 import {
   Container,
   Grid,
@@ -10,6 +12,7 @@ import {
   Snackbar,
   Alert,
   CircularProgress,
+  AlertColor,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import {
@@ -74,69 +77,57 @@ const SocialIcons = styled(Box)({
     },
   },
 });
+// Define proper type for snackbar state
+interface SnackbarState {
+  open: boolean;
+  message: string;
+  severity: AlertColor; // Use AlertColor type from MUI
+}
 
 const ContactUs = () => {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
-  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState({
+  const [snackbar, setSnackbar] = useState<SnackbarState>({
     open: false,
     message: "",
     severity: "success",
   });
-
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.fullName) newErrors.fullName = "Full name is required";
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Invalid email format";
-    }
-    if (!formData.message) newErrors.message = "Message is required";
-    if (formData.phone && !/^\d{10}$/.test(formData.phone)) {
-      newErrors.phone = "Invalid phone number";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (validateForm()) {
+  const validateSchema = Yup.object({
+    fullName: Yup.string().required("Full name is required"),
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    phone: Yup.string(),
+    // .required("Phone number is required")
+    message: Yup.string().required("Message is required"),
+  });
+  const formik = useFormik({
+    initialValues: {
+      fullName: "",
+      email: "",
+      phone: "",
+      message: "",
+    },
+    validationSchema: validateSchema,
+    onSubmit: async (values) => {
       setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        // await new Promise((resolve) => setTimeout(resolve, 2000));
         setSnackbar({
           open: true,
           message: "Message sent successfully!",
           severity: "success",
         });
-        setFormData({ fullName: "", email: "", phone: "", message: "" });
-      } catch (error) {
+        console.log(values);
+      } catch (err) {
+        console.log(err);
         setSnackbar({
           open: true,
-          message: "Failed to send message. Please try again.",
+          message: `Failed to send message. Please try again. `,
           severity: "error",
         });
       } finally {
         setLoading(false);
       }
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
+    },
+  });
 
   return (
     <>
@@ -148,15 +139,19 @@ const ContactUs = () => {
                 <Typography variant="h4" gutterBottom>
                   Get in Touch
                 </Typography>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={formik.handleSubmit}>
                   <TextField
                     fullWidth
                     label="Full Name"
                     name="fullName"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    error={!!errors.fullName}
-                    helperText={errors.fullName}
+                    value={formik.values.fullName}
+                    onChange={formik.handleChange}
+                    error={
+                      formik.touched.fullName && Boolean(formik.errors.fullName)
+                    }
+                    helperText={
+                      formik.touched.fullName && formik.errors.fullName
+                    }
                     margin="normal"
                     required
                   />
@@ -165,10 +160,10 @@ const ContactUs = () => {
                     label="Email Address"
                     name="email"
                     type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    error={!!errors.email}
-                    helperText={errors.email}
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    error={formik.touched.email && Boolean(formik.errors.email)}
+                    helperText={formik.touched.email && formik.errors.email}
                     margin="normal"
                     required
                   />
@@ -176,10 +171,10 @@ const ContactUs = () => {
                     fullWidth
                     label="Phone Number (Optional)"
                     name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    error={!!errors.phone}
-                    helperText={errors.phone}
+                    value={formik.values.phone}
+                    onChange={formik.handleChange}
+                    error={formik.touched.phone && Boolean(formik.errors.phone)}
+                    helperText={formik.touched.phone && formik.errors.phone}
                     margin="normal"
                   />
                   <TextField
@@ -188,10 +183,12 @@ const ContactUs = () => {
                     name="message"
                     multiline
                     rows={4}
-                    value={formData.message}
-                    onChange={handleChange}
-                    error={!!errors.message}
-                    helperText={errors.message}
+                    value={formik.values.message}
+                    onChange={formik.handleChange}
+                    error={
+                      formik.touched.message && Boolean(formik.errors.message)
+                    }
+                    helperText={formik.touched.message && formik.errors.message}
                     margin="normal"
                     required
                   />

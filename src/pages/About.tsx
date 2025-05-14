@@ -1,40 +1,46 @@
-import React, { useEffect } from "react";
 import Layout from "../components/Layout/Layout";
-import { Container, Typography, Grid, Card, CardContent, Box } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  Box,
+} from "@mui/material";
 import { motion } from "framer-motion";
-import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
-import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import "./AboutStyles.css";
 
 const AboutUs = () => {
   const fadeIn = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.6 }
+    transition: { duration: 0.6 },
   };
 
   const features = [
     {
       icon: <ShoppingBasketIcon sx={{ fontSize: 40 }} />,
       title: "Wide Selection",
-      description: "Browse through thousands of products from top brands"
+      description: "Browse through thousands of products from top brands",
     },
     {
       icon: <LocalShippingIcon sx={{ fontSize: 40 }} />,
       title: "Fast Delivery",
-      description: "Get your orders delivered within 24-48 hours"
+      description: "Get your orders delivered within 24-48 hours",
     },
     {
       icon: <SupportAgentIcon sx={{ fontSize: 40 }} />,
       title: "24/7 Support",
-      description: "Our customer service team is always here to help"
-    }
+      description: "Our customer service team is always here to help",
+    },
   ];
 
   return (
     <Layout>
-      <Container sx={{ marginTop: '100px' }}>
+      <Container sx={{ marginTop: "100px" }}>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -63,7 +69,10 @@ const AboutUs = () => {
                   Our Story
                 </Typography>
                 <Typography variant="body1" paragraph>
-                  Founded in 2023, we've been committed to providing our customers with the best shopping experience possible. Our journey started with a simple idea: make quality products accessible to everyone.
+                  Founded in 2023, we've been committed to providing our
+                  customers with the best shopping experience possible. Our
+                  journey started with a simple idea: make quality products
+                  accessible to everyone.
                 </Typography>
               </motion.div>
             </Grid>
@@ -78,7 +87,9 @@ const AboutUs = () => {
                   Our Mission
                 </Typography>
                 <Typography variant="body1" paragraph>
-                  We strive to offer unparalleled service and the finest products to our customers. Our mission is to transform the online shopping experience through innovation and dedication.
+                  We strive to offer unparalleled service and the finest
+                  products to our customers. Our mission is to transform the
+                  online shopping experience through innovation and dedication.
                 </Typography>
               </motion.div>
             </Grid>
@@ -96,9 +107,7 @@ const AboutUs = () => {
                 >
                   <Card className="feature-card">
                     <CardContent>
-                      <Box className="feature-icon">
-                        {feature.icon}
-                      </Box>
+                      <Box className="feature-icon">{feature.icon}</Box>
                       <Typography variant="h5" gutterBottom>
                         {feature.title}
                       </Typography>

@@ -3,7 +3,7 @@ import { FC } from "react";
 import { useDispatch } from "react-redux";
 import { changeQuantity } from "../reducers/cart";
 // import { DecimationAlgorithm } from "chart.js";
-import { CartItemProps } from "../types/ProductTypes";
+import { CartItemProps } from "../types/productTypes";
 
 const CartItem: FC<CartItemProps> = ({ data: detail }) => {
   // console.log(data.title);

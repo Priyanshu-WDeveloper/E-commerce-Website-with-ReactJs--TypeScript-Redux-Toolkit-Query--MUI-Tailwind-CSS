@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 // import { RootState } from "./app/store"
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   Backdrop,
   Box,
@@ -18,6 +18,7 @@ import Bookcard from "./Bookcard";
 import { RootState } from "../app/store";
 import Sidebar from "./Sidebar";
 import { useLazyGetProductDataQuery } from "../services/api/ApiSlice";
+import { Product } from "../types/productTypes";
 
 // interface Product {
 //     category: string;
@@ -27,21 +28,17 @@ import { useLazyGetProductDataQuery } from "../services/api/ApiSlice";
 //     products: Product[];
 // }
 
-export let ProductData: any[] = [];
-export let TotalData;
+// export let TotalData;
 const MainContent = () => {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [filter, setFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const [open, setOpen] = useState(false);
   const itemPerPage = 12;
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
   };
-  const dispatch = useDispatch();
   const { searchQuery, selectedCategory, minPrice, maxPrice, keyword } =
     useSelector((state: RootState) => state.filter);
   // const { data, isLoading, error } = useGetSimpleDataQuery();
@@ -61,14 +58,16 @@ const MainContent = () => {
 
   useEffect(() => {
     if (selectedCategory) {
-      trigger({ limit, skip, category: selectedCategory }).then((res) => {
-        console.log("API Response for category:", selectedCategory, res);
-      });
-      console.log("selectedCategoryyyyyyyyyyyy", selectedCategory);
+      trigger({ limit, skip, category: selectedCategory });
+      // .then((res) => {
+      //   console.log("API Response for category:", selectedCategory, res);
+      // });
+      // console.log("selectedCategoryyyyyyyyyyyy", selectedCategory);
     } else if (keyword) {
-      trigger({ limit, skip, search: keyword }).then((res) => {
-        console.log("API Response for search:", res, keyword);
-      });
+      trigger({ limit, skip, search: keyword });
+      // .then((res) => {
+      //   console.log("API Response for search:", res, keyword);
+      // });
     } else {
       trigger({ limit, skip, sort, order });
       // trigger({ limit, skip, sort, order }).then((res) =>
@@ -79,11 +78,11 @@ const MainContent = () => {
   useEffect(() => {
     if (data && Array.isArray(data.products)) {
       setProducts(data.products);
-      ProductData = data.products;
-      TotalData = data.total;
+      // console.log(data);
+
+      // TotalData = data.total;
     } else {
       setProducts([]);
-      ProductData = [];
     }
   }, [data]);
 
@@ -178,7 +177,7 @@ const MainContent = () => {
       case "cheap":
         return [...filteredProducts].sort((a, b) => a.price - b.price);
       case "popular":
-        return [...filteredProducts].sort((a, b) => b.rating - a.rating);
+        return [...filteredProducts].sort((a, b) => b.rating! - a.rating!);
       default:
         return filteredProducts;
     }
@@ -326,7 +325,7 @@ const MainContent = () => {
 
                 {filteredProducts.map((product) => (
                   <Bookcard
-                    // key={product.id}
+                    key={product.id}
                     // id={product.id}
                     // title={product.title || ""}
                     // // image={product.images[0]}

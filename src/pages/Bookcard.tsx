@@ -6,16 +6,17 @@ import {
   CardMedia,
   Typography,
 } from "@mui/material";
-import { FC } from "react";
+// import { FC } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { addToCart } from "../reducers/cart";
 // import { RootState } from "../app/store";
 import { useToast } from "../helpers/toasts/useToast";
-import { Product } from "../types/ProductTypes";
+import { CartItemProps } from "../types/productTypes";
+// import { Product } from "../types/ProductTypes";
 
-const Bookcard = (props) => {
-  console.log(props);
+const Bookcard = (props: CartItemProps) => {
+  // console.log(props);
   const {
     id,
     title,
@@ -25,8 +26,10 @@ const Bookcard = (props) => {
     brand,
     returnPolicy,
     discountPercentage,
+    quantity = 1,
+    // rating
   } = props.data;
-  console.log(title);
+  // console.log(title);
 
   // const carts = useSelector((store: RootState) => store.cart.items);
 
@@ -45,15 +48,17 @@ const Bookcard = (props) => {
         returnPolicy,
         discountPercentage,
         thumbnail,
+        quantity,
+        // rating
       })
     );
   };
   return (
     <>
-      <Box display="flex" flexWrap="wrap" gap={3}>
+      <Box key={id} display="flex" flexWrap="wrap" gap={3}>
         <Card
           key={id}
-          className="h-[280px]"
+          className="h-[290px] " //280->290
           sx={{
             width: 350,
             borderRadius: 2,
@@ -72,6 +77,7 @@ const Bookcard = (props) => {
                 position: "relative",
                 height: 200,
                 overflow: "hidden",
+
                 // "&::before": {
                 //   content: '""',
                 //   position: "absolute",
@@ -112,7 +118,7 @@ const Bookcard = (props) => {
               <CardMedia
                 component="img"
                 image={thumbnail}
-                alt={name}
+                alt={title} // it causes overload
                 sx={{
                   width: "100%",
                   height: "100%",
@@ -178,9 +184,22 @@ const Bookcard = (props) => {
               </Typography>
               <Button
                 className="bg-black rounded-2xl"
-                // sx={{ backgroundColor: "black" }}
+                sx={{
+                  backgroundColor: "black",
+                  width: "90px",
+                  fontSize: "11px",
+                  height: "30px",
+                  fontWeight: "1000",
+                  // mb: "10px",
+                  ":hover": {
+                    backgroundColor: "black",
+                    color: "white",
+                  },
+
+                  color: "white",
+                }}
                 // color="primary"
-                // variant="outlined"
+                variant="text"
                 onClick={handleAddToCart}
               >
                 Add to Cart

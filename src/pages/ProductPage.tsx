@@ -15,59 +15,55 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ProductData } from "../types/productTypes";
 
-interface Product {
-  id: number;
-  title: string;
-  description: string;
-  price: number;
-  rating: number;
-  images: string[];
-}
 const ProductPage = () => {
   const { id } = useParams<{ id: string }>();
   // console.log("Product ID", id);
 
   const navigate = useNavigate();
-  const [product, setProduct] = useState<Product | null>(null); //! null
+  const [product, setProduct] = useState<ProductData | null>(null); //! null
 
   useEffect(() => {
-    if (id) {
-      axios
-        .get<Product>(`https://dummyjson.com/products/${id}`)
-        .then((response) => {
+    // if (id) {
+    //   axios
+    //     .get<Product>(`https://dummyjson.com/products/${id}`)
+    //     .then((response) => {
+    //       setProduct(response.data);
+    //     })
+    //     .catch((error) => {
+    //       console.log(`Error fectching Product Data: ${error}`);
+    //     });
+    // }
+    (async () => {
+      try {
+        if (id) {
+          const response = await axios.get<ProductData>(
+            `https://dummyjson.com/products/${id}`
+          );
           setProduct(response.data);
-        })
-        .catch((error) => {
-          console.log(`Error fectching Product Data: ${error}`);
-        });
-    }
+          // console.log(response);
+        }
+      } catch (error) {
+        console.log(`Error fectching Product Data: ${error}`);
+      }
+    })();
   }, [id]);
 
   const [open, setOpen] = useState(true);
   const handleClose = () => {
     setOpen(false);
   };
-  const handleOpen = () => {
-    setOpen(true);
-  };
-  if (!product) {
-    // return <Typography variant="h1">Loading</Typography>
-    return (
-      <>
-        {/* <Button onClick={() => setBackdropOpen(true)}>Simulate Loading</Button> */}
 
-        {/* Render the SimpleBackdrop component */}
-        {/* <SimpleBackdrop open={isBackdropOpen} onClose={handleCloseBackdrop} /> */}
-        {/* <Button onClick={handleOpen}>Show backdrop</Button> */}
-        <Backdrop
-          sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
-          open={open}
-          onClick={handleClose}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
-      </>
+  if (!product) {
+    return (
+      <Backdrop
+        sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
+        open={open}
+        onClick={handleClose}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     );
   }
   return (

@@ -28,10 +28,11 @@ import { RootState } from "../app/store";
 import { useDispatch, useSelector } from "react-redux";
 import { changeQuantity } from "../reducers/cart";
 import { Link } from "react-router-dom";
+import { Product } from "../types/productTypes";
 
 const ShoppingCart = () => {
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const [donationAmount, setDonationAmount] = useState(null);
+  const [donationAmount, setDonationAmount] = useState<string | null>(null);
   const items = useSelector((store: RootState) => store.cart.items);
   // console.log(items);
 
@@ -75,7 +76,9 @@ const ShoppingCart = () => {
   );
   const platformFee = 20;
 
-  const handleRemoveItem = (id) => {
+  const handleRemoveItem = (id: number) => {
+    console.log(id);
+
     // In a real app, you would remove the item here
     console.log(`Remove item ${id}`);
   };
@@ -87,7 +90,7 @@ const ShoppingCart = () => {
   //     setSelectedItems([...selectedItems, id]);
   //   }
   // };
-  const toggleItemSelection = (id) => {
+  const toggleItemSelection = (id: number) => {
     setSelectedItems((prevSelected) => {
       if (prevSelected.includes(id)) {
         // Remove the ID if it's already selected
@@ -98,8 +101,7 @@ const ShoppingCart = () => {
       }
     });
   };
-  const handleMinus = (item) => {
-    console.log(item.id);
+  const handleMinus = (item: Product) => {
     dispatch(
       changeQuantity({
         productId: item.id,
@@ -107,9 +109,7 @@ const ShoppingCart = () => {
       })
     );
   };
-  const handlePlus = (item) => {
-    console.log(item.id);
-
+  const handlePlus = (item: Product) => {
     dispatch(
       changeQuantity({
         productId: item.id,
@@ -123,7 +123,7 @@ const ShoppingCart = () => {
     // return acc + (p?.price ?? 0) * item.quantity;
   }, 0);
   console.log(cartTotalPrice);
-  function findMRP(discountedPrice, discountPercent) {
+  function findMRP(discountedPrice: number, discountPercent: number): number {
     if (discountPercent >= 100) {
       throw new Error("Discount cannot be 100% or more");
     }
@@ -276,7 +276,6 @@ const ShoppingCart = () => {
             {/* Product list */}
             {items.map((item) => (
               <Paper key={item.id} sx={{ p: 2, mb: 2, position: "relative" }}>
-                {console.log(item)}
                 <IconButton
                   size="small"
                   sx={{ position: "absolute", top: 8, right: 8 }}
@@ -290,6 +289,20 @@ const ShoppingCart = () => {
                     checked={selectedItems.includes(item.id)}
                     onChange={() => toggleItemSelection(item.id)}
                     color="error"
+                    sx={{
+                      width: 10,
+                      height: 10,
+                      "& .MuiSvgIcon-root": {
+                        fontSize: 20,
+                        // fill: "transparent", // remove inner fill if you want
+                        stroke: "#ffffff", // 👈 your custom border color
+                        strokeWidth: 0.5,
+                      },
+                      // "&.Mui-checked .MuiSvgIcon-root": {
+                      //   fill: "#6a0dad", // filled color when checked
+                      //   stroke: "#6a0dad", // outline color still visible
+                      // },
+                    }}
                   />
                   <Box
                     component="img"
@@ -300,10 +313,19 @@ const ShoppingCart = () => {
 
                   <Box flex={1}>
                     <Typography variant="body1" fontWeight="bold">
-                      {item.title}
+                      {item.brand}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Sold by: {item.seller || "Trusted Seller"}
+                      {/* Sold by: {item.seller || "Trusted Seller"} */}
+                      {!item.brand ? (
+                        <span style={{ color: "black", fontWeight: 700 }}>
+                          {" "}
+                          {item.title}
+                        </span>
+                      ) : (
+                        <>{item.title}</>
+                      )}
+                      {/* {item.title} */}
                     </Typography>
 
                     {/* <Box display="flex" mt={2}>

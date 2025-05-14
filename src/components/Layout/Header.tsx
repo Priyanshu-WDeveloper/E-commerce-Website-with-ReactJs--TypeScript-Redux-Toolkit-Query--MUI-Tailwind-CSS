@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   AppBar,
   Box,
@@ -18,10 +18,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../../styles/HeadStyles.css";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { toggleStatusTab } from "../../reducers/cart";
 import { useLazyGetCategoryListQuery } from "../../services/api/ApiSlice";
 import { setSelectedCategory } from "../../reducers/FilterSlice";
 import LongMenu from "../LongMenu";
+import { CategoryResponse } from "../../types/productTypes";
 
 const Header = () => {
   const location = useLocation();
@@ -34,7 +34,7 @@ const Header = () => {
   const carts = useSelector((store: RootState) => store.cart.items);
   const dispatch = useDispatch();
   const [categoryData] = useLazyGetCategoryListQuery();
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<CategoryResponse>([]);
 
   const handleOpenTabCart = () => {
     // dispatch(toggleStatusTab());

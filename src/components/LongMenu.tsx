@@ -33,6 +33,7 @@ export default function LongMenu({ option }: LongMenuProps) {
           aria-expanded={open ? "true" : undefined}
           aria-haspopup="true"
           onClick={handleClick}
+          sx={{ color: "white", ml: "5px" }}
         >
           <MoreVertIcon />
         </IconButton>

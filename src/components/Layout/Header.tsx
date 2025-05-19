@@ -34,7 +34,7 @@ const Header = () => {
 
   const carts = useSelector((store: RootState) => store.cart.items);
   const dispatch = useDispatch();
-  const [categoryData] = useLazyGetCategoryListQuery();
+  // const [categoryData] = useLazyGetCategoryListQuery();
   const [categories, setCategories] = useState<CategoryResponse>([]);
 
   const handleOpenTabCart = () => {
@@ -70,14 +70,14 @@ const Header = () => {
     { text: "Analytics", path: "/analytics" },
     { text: "About", path: "/about" },
   ];
-  const getCategories = async () => {
-    const data = await categoryData().unwrap();
-    // console.log("categoryData", data);
-    setCategories(data);
-  };
-  useEffect(() => {
-    getCategories();
-  }, []);
+  // const getCategories = async () => {
+  //   const data = await categoryData().unwrap();
+  //   // console.log("categoryData", data);
+  //   setCategories(data);
+  // };
+  // useEffect(() => {
+  //   getCategories();
+  // }, []);
   const handleCategoryClick = (category: string) => {
     console.log(category);
 

@@ -15,66 +15,48 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ProductData } from "../types/productTypes";
-import axios from "axios";
-// import { useLazyGetProductDataByIdQuery } from "../services/ProductData";
+import {
+  useGetProductDataByIdQuery,
+  useLazyGetProductDataByIdQuery,
+} from "../services/ProductData";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 const ProductPage = () => {
   const { id } = useParams<{ id: string }>();
-  // console.log("Product ID", id);
+  console.log("Product ID", id);
 
   const navigate = useNavigate();
   const [product, setProduct] = useState<ProductData | null>(null); //! null
-  // const [productData] = useLazyGetProductDataByIdQuery();
-  // const [trigger, { data: response }] = useLazyGetProductDataByIdQuery();
-  // console.log(response);
+  const [productData] = useLazyGetProductDataByIdQuery();
+  // const { data: response, isLoading } = useGetProductDataByIdQuery(
+  //   id ? { id } : skipToken
+  // );
   // useEffect(() => {
-  //   if (id) {
-  //     trigger({ id });
-  //   }
-  //   // trigger(id ? { id } : skipToken);
-  // }, [trigger, id]);
-  useEffect(() => {
-    //   // if (id) {
-    //   //   axios
-    //   //     .get<Product>(`https://dummyjson.com/products/${id}`)
-    //   //     .then((response) => {
-    //   //       setProduct(response.data);
-    //   //     })
-    //   //     .catch((error) => {
-    //   //       console.log(`Error fectching Product Data: ${error}`);
-    //   //     });
-    //   // }
-    (async () => {
-      try {
-        if (id) {
-          const response = await axios.get<ProductData>(
-            `https://dummyjson.com/products/${id}`
-          );
-          setProduct(response.data);
-          console.log(response);
-        }
-      } catch (error) {
-        console.log(`Error fectching Product Data: ${error}`);
-      }
-    })();
-  }, [id]);
-  // const getProductData = async () => {
-  //   try {
-  //     const response = await productData({ id } as { id: string });
-  //     console.log(response.data);
+  //   if (response && response.data) {
+  //     console.log(response);
+
   //     setProduct(response.data);
-  //   } catch (error) {
-  //     console.log(error);
   //   }
-  // };
-  // useEffect(() => {
-  //   getProductData();
-  // }, []);
+  // }, [response]);
+  const getProductData = async () => {
+    try {
+      const response = await productData({ id } as { id: string });
+      console.log(response);
+      // if (response && response.data) {
+      setProduct(response.data);
+      // }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // getProductData();
   const [open, setOpen] = useState(true);
   const handleClose = () => {
     setOpen(false);
   };
-
+  useEffect(() => {
+    getProductData();
+  }, []);
   if (!product) {
     return (
       <Backdrop
@@ -146,7 +128,7 @@ const ProductPage = () => {
                     backgroundColor: "#f8f9fa",
                   }}
                   image={product.images[0]}
-                  alt={product.title}
+                  alt={product.title || "Product image"}
                   className="transition-transform duration-300 hover:scale-105"
                 />
               </CardActionArea>
@@ -207,7 +189,7 @@ const ProductPage = () => {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Rating
                     name="half-rating-read"
-                    defaultValue={product.rating}
+                    defaultValue={product.rating || 0}
                     precision={0.5}
                     readOnly
                     sx={{ color: "#faaf00" }}

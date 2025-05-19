@@ -27,6 +27,8 @@ const TopSellers = () => {
           "https://randomuser.me/api/?results=5"
         );
         const data = response.data;
+        const meta = import.meta.env.VITE_BACK_URI;
+        console.log(meta);
 
         const authorsData = data.results.map((user: AuthorData) => {
           // user is a single object of type AuthorData, not an array

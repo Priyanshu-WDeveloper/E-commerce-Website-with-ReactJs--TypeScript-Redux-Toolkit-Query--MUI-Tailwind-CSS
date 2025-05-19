@@ -1,12 +1,11 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { apiSlicess } from "../utils/rtk";
+
 import {
   CategoryResponse,
   Product,
   ProductData,
   ProductsResponse,
-} from "../../types/productTypes";
-// const URL = "https://dummyjson.com/products";
-const URL = import.meta.env.VITE_BACK_URI;
+} from "../types/productTypes";
 type CommonResponseType = {
   statusCode: number;
   message: string;
@@ -16,10 +15,7 @@ type CommonResponseType = {
   //   products?: any;
   // };
 };
-
-export const apiSlice = createApi({
-  reducerPath: "apiSlice",
-  baseQuery: fetchBaseQuery({ baseUrl: URL }),
+export const ProductDataApi = apiSlicess.injectEndpoints({
   endpoints: (builder) => ({
     getProductData: builder.query<
       CommonResponseType & { data: ProductsResponse },
@@ -51,20 +47,26 @@ export const apiSlice = createApi({
         // }
         // if (category) {
         //   url += `&category/${category}`;
-        let url = "";
+        let url = "api/dummy/products";
+        console.log(url);
+
         if (category) {
-          url = `/category/${category}`;
+          url = `api/dummy/products/category/${category}`;
           const params = [];
           if (limit) params.push(`limit=${limit}`);
           if (skip) params.push(`skip=${skip}`);
           if (params.length > 0) url += `?${params.join("&")}`;
         } else if (search) {
-          url = "/";
+          // url = "/";
+          url = `api/dummy/products/search`;
+
           const params = [];
-          if (search) params.push(`search?q=${search}`);
-          if (params.length > 0) url += `${params.join("&")}`;
+          if (search) params.push(`q=${search}`);
+          // if (search) params.push(`search?q=${search}`);
+          if (params.length > 0) url += `?${params.join("&")}`;
+          // if (params.length > 0) url += `${params.join("&")}`;
         } else {
-          url = "";
+          url = "api/dummy/products";
           const params = [];
           if (limit) params.push(`limit=${limit}`);
           if (skip) params.push(`skip=${skip}`);
@@ -84,7 +86,7 @@ export const apiSlice = createApi({
       { id: string }
     >({
       query: ({ id }) => ({
-        url: `/${id}`,
+        url: `api/dummy/products/${id}`,
         method: "GET",
       }),
     }),
@@ -93,7 +95,7 @@ export const apiSlice = createApi({
       void
     >({
       query: () => {
-        return { url: URL, method: "GET" };
+        return { url: "api/dummy/products", method: "GET" };
       },
     }),
     getCategoryList: builder.query<
@@ -101,7 +103,7 @@ export const apiSlice = createApi({
       void
     >({
       query: () => ({
-        url: `/category-list`,
+        url: `api/dummy/products/category-list`,
         method: "GET",
       }),
     }),
@@ -110,14 +112,17 @@ export const apiSlice = createApi({
       string
     >({
       query: (category) => ({
-        url: `/category/${category}`,
+        url: `api/dummy/products/category/${category}`,
         method: "GET",
       }),
     }),
   }),
 });
+
 export const {
+  useGetProductDataQuery,
   useLazyGetProductDataQuery,
+  useGetProductDataByIdQuery,
   useLazyGetProductDataByIdQuery,
   useGetSimpleDataQuery,
   useLazyGetSimpleDataQuery,
@@ -125,4 +130,4 @@ export const {
   useLazyGetProductDataByCategoryQuery,
   useGetCategoryListQuery,
   useLazyGetCategoryListQuery,
-} = apiSlice;
+} = ProductDataApi;

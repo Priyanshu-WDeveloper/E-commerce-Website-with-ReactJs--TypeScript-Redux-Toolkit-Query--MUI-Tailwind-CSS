@@ -17,11 +17,12 @@ import Bookcard from "./Bookcard";
 
 import { RootState } from "../app/store";
 import Sidebar from "./Sidebar";
-import { useLazyGetProductDataQuery } from "../services/api/ApiSlice";
+// import { useLazyGetProductDataQuery } from "../services/api/ApiSlice";
 import { Product } from "../types/productTypes";
 import {
   useGetCategoryListQuery,
   useGetProductDataQuery,
+  useLazyGetProductDataQuery,
 } from "../services/ProductData";
 
 // interface Product {
@@ -47,7 +48,7 @@ const MainContent = () => {
     useSelector((state: RootState) => state.filter);
   // const { data, isLoading, error } = useGetSimpleDataQuery();
 
-  const [trigger, { data, isLoading }] = useLazyGetProductDataQuery();
+  const [getProduct, { data, isLoading }] = useLazyGetProductDataQuery();
   // const [trigger, ress] = useLazyGetSimpleDataQuery();
   // if (!isLoading && data) {
   // console.log(data);
@@ -55,12 +56,12 @@ const MainContent = () => {
   const limmiter = 10;
   const skipp = 0;
 
-  const {
-    data: categoriesNewData,
-    isLoading: isNewCategoriesLoading,
-    isError: isNewCategoriesError,
-    error,
-  } = useGetProductDataQuery({ limit: limmiter, skip: skipp });
+  // const {
+  //   data: categoriesNewData,
+  //   isLoading: isNewCategoriesLoading,
+  //   isError: isNewCategoriesError,
+  //   error,
+  // } = useGetProductDataQuery({ limit: limmiter, skip: skipp });
 
   // Debug information
   // console.log("categoriesNewData:", categoriesNewData);
@@ -74,36 +75,85 @@ const MainContent = () => {
   // const skip = (currentPage - 1) * limit;
   // const category = selectedCategory;
   // console.log("data", data);
-
-  useEffect(() => {
-    if (selectedCategory) {
-      trigger({ limit, skip, category: selectedCategory });
-      // .then((res) => {
-      //   console.log("API Response for category:", selectedCategory, res);
-      // });
-      // console.log("selectedCategoryyyyyyyyyyyy", selectedCategory);
-    } else if (keyword) {
-      trigger({ limit, skip, search: keyword });
-      // .then((res) => {
-      //   console.log("API Response for search:", res, keyword);
-      // });
-    } else {
-      trigger({ limit, skip, sort, order });
-      // trigger({ limit, skip, sort, order }).then((res) =>
-      //   console.log("ress", res)
-      // );
-    }
-  }, [trigger, limit, skip, selectedCategory, keyword, sort, order]);
-  useEffect(() => {
-    if (data && Array.isArray(data.products)) {
-      setProducts(data.products);
+  const getProductData = async (
+    limit: number,
+    skip: number,
+    sort: string,
+    order: string
+  ) => {
+    try {
+      const result = await getProduct({ limit, skip, sort, order });
+      // console.log(result?.data?.products);
       // console.log(data);
 
-      // TotalData = data.total;
-    } else {
-      setProducts([]);
+      // setProducts(result?.data?.products);
+      if (result && result.data) {
+        // If products are in data.products (as defined in ProductsResponse type)
+        if (result.data.products && Array.isArray(result.data.products)) {
+          setProducts(result.data.products);
+        }
+        // If products are in the main data object
+        // else if (
+        //   result.data.data &&
+        //   result.data.data.products &&
+        //   Array.isArray(result.data.data.products)
+        // ) {
+        //   setProducts(result.data.data.products);
+        // }
+        // If products are directly in the response
+        else if (Array.isArray(result.data)) {
+          setProducts(result.data);
+        }
+        // If products are in the CommonResponseType's products property
+        else if (result.data.products && Array.isArray(result.data.products)) {
+          setProducts(result.data.products);
+        }
+        // Fallback to empty array if structure doesn't match any expected pattern
+        else {
+          console.error("Unexpected data structure:", result);
+          setProducts([]);
+        }
+      } else {
+        // Handle undefined result or data
+        setProducts([]);
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      // setProducts([]);
     }
-  }, [data]);
+  };
+  useEffect(() => {
+    getProductData(limit, skip, sort, order);
+  }, []);
+  // useEffect(() => {
+  //   if (selectedCategory) {
+  //     trigger({ limit, skip, category: selectedCategory });
+  //     // .then((res) => {
+  //     //   console.log("API Response for category:", selectedCategory, res);
+  //     // });
+  //     // console.log("selectedCategoryyyyyyyyyyyy", selectedCategory);
+  //   } else if (keyword) {
+  //     trigger({ limit, skip, search: keyword });
+  //     // .then((res) => {
+  //     //   console.log("API Response for search:", res, keyword);
+  //     // });
+  //   } else {
+  //     trigger({ limit, skip, sort, order });
+  //     // trigger({ limit, skip, sort, order }).then((res) =>
+  //     //   console.log("ress", res)
+  //     // );
+  //   }
+  // }, [trigger, limit, skip, selectedCategory, keyword, sort, order]);
+  // useEffect(() => {
+  //   if (data && Array.isArray(data.products)) {
+  //     setProducts(data.products);
+  //     // console.log(data);
+
+  //     // TotalData = data.total;
+  //   } else {
+  //     setProducts([]);
+  //   }
+  // }, [data]);
 
   //   useEffect(() => {
   //     let url = `https://dummyjson.com/products?limit=${itemPerPage}&skip=${(currentPage - 1) * itemPerPage}`

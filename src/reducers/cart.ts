@@ -1,14 +1,25 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Product } from "../types/productTypes";
-
+import { ShippingAddress } from "../types/ShippingAdress";
+interface OrderDetails {
+  // items: CartItem[];
+  items: Product[];
+  total: number;
+}
 interface CartSlice {
   items: Product[];
   statusTab: boolean;
+  address: ShippingAddress | null;
+  paymentMethod: string;
+  total: number;
   //   items: [],
 }
 const initialState: CartSlice = {
   items: [],
   statusTab: false,
+  address: null,
+  paymentMethod: "",
+  total: 0,
 };
 const cartSlice = createSlice({
   name: "cart",
@@ -47,7 +58,7 @@ const cartSlice = createSlice({
         (item) => item.id === productId
       );
       if (indexProductId === -1) {
-        console.error(`Item with id ${productId} not found in cart`);
+        // console.error(`Item with id ${productId} not found in cart`);
         return;
       }
       if (quantity > 0) {
@@ -56,12 +67,29 @@ const cartSlice = createSlice({
         state.items = state.items.filter((item) => item.id !== productId);
       }
     },
-    toggleStatusTab(state) {
-      state.statusTab = !state.statusTab;
+    setAddress: (state, action: PayloadAction<ShippingAddress>) => {
+      state.address = action.payload;
+    },
+    setOrderDetails(state, action: PayloadAction<OrderDetails>) {
+      state.items = action.payload.items;
+      state.total = action.payload.total;
+    },
+    setPaymentMethod: (state, action: PayloadAction<string>) => {
+      state.paymentMethod = action.payload;
+    },
+    clearCart: (state) => {
+      state.items = [];
     },
   },
 });
-export const { addToCart, changeQuantity, toggleStatusTab } = cartSlice.actions;
+export const {
+  addToCart,
+  changeQuantity,
+  setAddress,
+  setOrderDetails,
+  setPaymentMethod,
+  clearCart,
+} = cartSlice.actions;
 export default cartSlice.reducer;
 
 // import { createSlice, PayloadAction } from "@reduxjs/toolkit";

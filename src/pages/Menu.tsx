@@ -1,8 +1,8 @@
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import TopSellers from "./TopSellers";
-import PopularBlogs from "./PopularBlogs";
 import Header from "../components/Layout/Header";
+import UserPosts from "./UserPosts";
 // import CartTab from "../components/CartTab";
 
 const Menu = () => {
@@ -18,7 +18,9 @@ const Menu = () => {
         {/* <Box className="fixed right-0 top-0 shadow-lg overflow-y-auto"> */}
         <Box>
           <TopSellers />
-          <PopularBlogs />
+          {/* <TopUsers /> */}
+          {/* <PopularBlogs /> */}
+          <UserPosts />
         </Box>
       </Box>
     </>

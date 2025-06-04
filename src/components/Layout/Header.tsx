@@ -19,10 +19,11 @@ import "../../styles/HeadStyles.css";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 // import { useLazyGetCategoryListQuery } from "../../services/api/ApiSlice";
-import { setSelectedCategory } from "../../reducers/FilterSlice";
+// import { setSelectedCategory } from "../../reducers/FilterSlice";
+// import { CategoryResponse } from "../../types/productTypes";
+// import { useLazyGetCategoryListQuery } from "../../services/ProductData";
+import { logOut, selectCurrentUser } from "../../reducers/authSlice";
 import LongMenu from "../LongMenu";
-import { CategoryResponse } from "../../types/productTypes";
-import { useLazyGetCategoryListQuery } from "../../services/ProductData";
 
 const Header = () => {
   const location = useLocation();
@@ -35,7 +36,7 @@ const Header = () => {
   const carts = useSelector((store: RootState) => store.cart.items);
   const dispatch = useDispatch();
   // const [categoryData] = useLazyGetCategoryListQuery();
-  const [categories, setCategories] = useState<CategoryResponse>([]);
+  // const [categories, setCategories] = useState<CategoryResponse>([]);
 
   const handleOpenTabCart = () => {
     // dispatch(toggleStatusTab());
@@ -59,6 +60,10 @@ const Header = () => {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+  const handleLogout = () => {
+    dispatch(logOut());
+    navigate("/");
+  };
 
   const menuItems = [
     { text: "Home", path: "/" },
@@ -69,6 +74,7 @@ const Header = () => {
   const profileOptions = [
     { text: "Analytics", path: "/analytics" },
     { text: "About", path: "/about" },
+    { text: "Login", path: "/login" },
   ];
   // const getCategories = async () => {
   //   const data = await categoryData().unwrap();
@@ -78,11 +84,14 @@ const Header = () => {
   // useEffect(() => {
   //   getCategories();
   // }, []);
-  const handleCategoryClick = (category: string) => {
-    console.log(category);
+  // const handleCategoryClick = (category: string) => {
+  //   console.log(category);
 
-    dispatch(setSelectedCategory(category));
-  };
+  //   dispatch(setSelectedCategory(category));
+  // };
+
+  const user = useSelector(selectCurrentUser);
+  const Welcome = user ? `Hello ${user}` : "Welcome Guest";
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
@@ -145,7 +154,7 @@ const Header = () => {
                   letterSpacing: "1px",
                 }}
               >
-                My Shopping
+                EverBasket
               </Typography>
             </Box>
 
@@ -193,7 +202,17 @@ const Header = () => {
                 </Button>
               ))}
             </Box>
-
+            <Typography
+              variant="h6"
+              sx={{
+                paddingInline: "10px",
+                marginRight: "10px",
+                borderBottom: "2px solid white",
+              }}
+            >
+              {/* Hello User */}
+              {Welcome}
+            </Typography>
             {/* Cart Icon */}
             <IconButton
               onClick={handleOpenTabCart}
@@ -203,6 +222,7 @@ const Header = () => {
                 backdropFilter: "blur(5px)",
                 border: "1px solid rgba(255, 255, 255, 0.2)",
                 transition: "all 0.3s ease",
+                marginRight: "5px",
                 "&:hover": {
                   background: "rgba(255, 255, 255, 0.2)",
                   border: "1px solid rgba(255, 255, 255, 0.3)",
@@ -219,8 +239,80 @@ const Header = () => {
               </Badge>
               {/* </Box> */}
             </IconButton>
-
-            <LongMenu option={profileOptions} />
+            <Box
+              sx={{
+                position: "relative",
+                zIndex: 1,
+                ml: 1,
+                isolation: "isolate", // Isolate this component to create a new stacking context
+              }}
+            >
+              <LongMenu option={profileOptions} />
+            </Box>
+            {user ? (
+              // <Button onClick={handleLogout} variant="contained">
+              //   Logout
+              // </Button>
+              <Button
+                onClick={handleLogout}
+                sx={{
+                  color: "white",
+                  textTransform: "none",
+                  fontSize: "1rem",
+                  padding: "6px 16px",
+                  borderRadius: "25px",
+                  background: "rgba(255, 255, 255, 0.1)",
+                  backdropFilter: "blur(5px)",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    background: "rgba(255, 255, 255, 0.2)",
+                    border: "1px solid rgba(255, 255, 255, 0.3)",
+                    transform: "translateY(-2px)",
+                  },
+                  "&.active": {
+                    background: "rgba(218, 165, 32, 0.2)",
+                    border: "1px solid goldenrod",
+                    color: "goldenrod",
+                  },
+                }}
+                // className={location.pathname === item.path ? "active" : ""}
+              >
+                Logout
+              </Button>
+            ) : (
+              // <Button component={Link} to="/login" variant="contained">
+              //   Login
+              // </Button>
+              <Button
+                component={Link}
+                to="/login"
+                sx={{
+                  color: "white",
+                  textTransform: "none",
+                  fontSize: "1rem",
+                  padding: "6px 16px",
+                  borderRadius: "25px",
+                  background: "rgba(255, 255, 255, 0.1)",
+                  backdropFilter: "blur(5px)",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    background: "rgba(255, 255, 255, 0.2)",
+                    border: "1px solid rgba(255, 255, 255, 0.3)",
+                    transform: "translateY(-2px)",
+                  },
+                  "&.active": {
+                    background: "rgba(218, 165, 32, 0.2)",
+                    border: "1px solid goldenrod",
+                    color: "goldenrod",
+                  },
+                }}
+                // className={location.pathname === item.path ? "active" : ""}
+              >
+                Login
+              </Button>
+            )}
 
             {/* </IconButton> */}
           </Toolbar>

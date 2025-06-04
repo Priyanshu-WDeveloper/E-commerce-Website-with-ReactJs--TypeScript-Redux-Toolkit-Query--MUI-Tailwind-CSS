@@ -48,7 +48,7 @@ export const ProductDataApi = apiSlicess.injectEndpoints({
         // if (category) {
         //   url += `&category/${category}`;
         let url = "api/dummy/products";
-        console.log(url);
+        // console.log(url);
 
         if (category) {
           url = `api/dummy/products/category/${category}`;
@@ -81,34 +81,30 @@ export const ProductDataApi = apiSlicess.injectEndpoints({
         };
       },
     }),
-    getProductDataById: builder.query<
-      CommonResponseType & { data: ProductData },
-      { id: string }
-    >({
+    getProductDataById: builder.query<ProductData, { id: string }>({
+      // using only ProductData bcause we are using it in the query
       query: ({ id }) => ({
         url: `api/dummy/products/${id}`,
         method: "GET",
       }),
     }),
     getSimpleData: builder.query<
-      CommonResponseType & { data: ProductsResponse },
+      CommonResponseType & { data: ProductsResponse }, //response.data.products
       void
     >({
       query: () => {
         return { url: "api/dummy/products", method: "GET" };
       },
     }),
-    getCategoryList: builder.query<
-      CommonResponseType & { data: CategoryResponse },
-      void
-    >({
+    getCategoryList: builder.query<CategoryResponse, void>({
+      //response.products
       query: () => ({
         url: `api/dummy/products/category-list`,
         method: "GET",
       }),
     }),
     getProductDataByCategory: builder.query<
-      CommonResponseType & { data: ProductsResponse },
+      CommonResponseType & { data: ProductsResponse }, //response.data.products
       string
     >({
       query: (category) => ({

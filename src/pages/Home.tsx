@@ -1,13 +1,16 @@
-import Layout from "../components/Layout/Layout";
+// import Layout from "../components/Layout/Layout";
 import { NavLink } from "react-router-dom";
 import Back from "../images/—Pngtree—3d rendered e commerce illustration_5800101.jpg";
 import "../styles/HomeStyles.css";
 import { Button, Box, Typography, Container } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import Header from "../components/Layout/Header";
 
 const Home = () => {
   return (
-    <Layout>
+    <>
+      {/* <Layout> */}
+      <Header />
       <Box
         className="home-container"
         sx={{
@@ -121,7 +124,8 @@ const Home = () => {
           </Box>
         </Container>
       </Box>
-    </Layout>
+      {/* </Layout> */}
+    </>
   );
 };
 

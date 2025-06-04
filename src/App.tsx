@@ -13,7 +13,15 @@ import ProductPage from "./pages/ProductPage";
 import Analytics from "./pages/Analytics";
 import Cart from "./components/Cart";
 import Checkout from "./components/Checkout";
-import Address from "./components/Address";
+import LoginPage from "./pages/auth/Login";
+import NoProductsFound from "./components/NoProductsFound";
+// import CusBackdrop from "./components/Backdrop";
+import LoadingBackdrop from "./components/Backdrop";
+import OrderConfirmation from "./pages/Checkout";
+import AddressPage from "./components/Address";
+import PaymentPage from "./components/PaymentPage";
+import SignupPage from "./pages/auth/SignUp";
+// import ShoppingCart from "./components/Cart2";
 function App() {
   return (
     <Router>
@@ -31,10 +39,16 @@ function App() {
         <Route path="/checkout" element={<Checkout />}>
           <Route index element={<Cart />} />
           <Route path="cart" element={<Cart />} />
-          <Route path="address" element={<Address />} />
+          {/* <Route path="cart2" element={<ShoppingCart />} /> */}
+          <Route path="address" element={<AddressPage />} />
+          <Route path="payment" element={<PaymentPage />} />
+          <Route path="confirmation" element={<OrderConfirmation />} />
         </Route>
-
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
         <Route path="*" element={<Pagenotfound />} />
+        <Route path="/noProducts" element={<NoProductsFound />} />
+        <Route path="/backdrop" element={<LoadingBackdrop />} />
       </Routes>
     </Router>
   );

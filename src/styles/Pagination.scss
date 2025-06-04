@@ -1,0 +1,88 @@
+$c_secondary: #343434;
+.pagination {
+  padding-top: 20px;
+  padding-left: 20px;
+
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
+
+  h3 {
+    width: 100%;
+    min-height: 280px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "regular";
+    font-size: 18px;
+  }
+
+  p {
+    font-size: 14px;
+    font-family: "regular";
+
+    span {
+      font-family: "bold";
+      color: black;
+    }
+  }
+
+  .pages {
+    display: flex;
+
+    .prevbtn {
+      background: no-repeat;
+      border: none;
+    }
+
+    svg {
+      font-size: 12px;
+      border: 0.5px solid #a5a5a5;
+      padding: 6px;
+      border-radius: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: auto;
+      margin-right: 10px;
+      cursor: pointer;
+      color: black;
+    }
+
+    .count {
+      display: flex;
+      align-items: center;
+      margin-right: 10px;
+      background: none;
+      /* padding: 6px; */
+      border-radius: 24px;
+      border: 0.5px solid #fff;
+
+      .actv {
+        background: $c_secondary;
+        color: white;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 100%;
+        cursor: pointer;
+      }
+
+      .inActv {
+        background: transparent;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 100%;
+        color: black;
+        cursor: pointer;
+        border: none;
+      }
+    }
+  }
+}

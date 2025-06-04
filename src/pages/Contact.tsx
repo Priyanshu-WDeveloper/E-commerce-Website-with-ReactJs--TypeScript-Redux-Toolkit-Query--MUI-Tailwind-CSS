@@ -1,5 +1,6 @@
 import { useState } from "react";
 import * as Yup from "yup";
+import * as Sentry from "@sentry/react";
 import { useFormik } from "formik";
 import {
   Container,
@@ -26,7 +27,8 @@ import {
 import Layout from "../components/Layout/Layout";
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: "2rem",
+  padding: theme.spacing(4),
+  //  padding: "2rem",
   height: "100%",
   boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
 }));
@@ -106,7 +108,8 @@ const ContactUs = () => {
       message: "",
     },
     validationSchema: validateSchema,
-    onSubmit: async (values) => {
+    // onSubmit: async (values) => {
+    onSubmit: async () => {
       setLoading(true);
       try {
         // await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -115,9 +118,16 @@ const ContactUs = () => {
           message: "Message sent successfully!",
           severity: "success",
         });
-        console.log(values);
+        // console.log(values);
       } catch (err) {
-        console.log(err);
+        // console.log(err);
+        if (import.meta.env.MODE !== "development") {
+          Sentry.captureException(err);
+          // console.error("Caught error:", err);
+        } else {
+          console.error("Caught error:", err);
+        }
+
         setSnackbar({
           open: true,
           message: `Failed to send message. Please try again. `,

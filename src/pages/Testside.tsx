@@ -9,7 +9,7 @@ import {
 
 const RadioButtonGroup: React.FC = () => {
   // Initialize categories as an empty array, can be populated dynamically
-  const [categories, setCategories] = useState<string[]>([
+  const [categories] = useState<string[]>([
     "Category 1",
     "Category 2",
     "Category 3",

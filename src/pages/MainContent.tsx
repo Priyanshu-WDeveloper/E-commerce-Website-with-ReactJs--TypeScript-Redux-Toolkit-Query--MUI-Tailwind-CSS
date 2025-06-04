@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
-// import { RootState } from "./app/store"
 import { useSelector } from "react-redux";
 import {
-  Backdrop,
   Box,
   Button,
-  CircularProgress,
   Divider,
   Drawer,
   List,
   ListItem,
   ListItemButton,
+  Pagination,
 } from "@mui/material";
 import BubbleChartIcon from "@mui/icons-material/BubbleChart";
 import Bookcard from "./Bookcard";
@@ -20,10 +18,22 @@ import Sidebar from "./Sidebar";
 // import { useLazyGetProductDataQuery } from "../services/api/ApiSlice";
 import { Product } from "../types/productTypes";
 import {
-  useGetCategoryListQuery,
-  useGetProductDataQuery,
+  // useGetCategoryListQuery,
+  // useGetProductDataQuery,
   useLazyGetProductDataQuery,
 } from "../services/ProductData";
+// import CustomPagination from "../components/Pagination";
+// import Pagenotfound from "../components/NoProductsFound";
+import NoProductsFound from "../components/NoProductsFound";
+// import {
+//   setKeyword,
+//   setMaxPrice,
+//   setMinPrice,
+//   setSearchQuery,
+//   setSelectedCategory,
+// } from "../reducers/FilterSlice";
+import LoadingBackdrop from "../components/Backdrop";
+import * as Sentry from "@sentry/react";
 
 // interface Product {
 //     category: string;
@@ -37,7 +47,12 @@ import {
 const MainContent = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [filter, setFilter] = useState("all");
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1);
+  const [pages, setPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  // const [notification, setNotification] = useState<Product[]>([]);
+  // const [pageChange, setPageChange] = useState(1);
+  // const dispatch = useDispatch();
 
   const [open, setOpen] = useState(false);
   const itemPerPage = 12;
@@ -48,13 +63,13 @@ const MainContent = () => {
     useSelector((state: RootState) => state.filter);
   // const { data, isLoading, error } = useGetSimpleDataQuery();
 
-  const [getProduct, { data, isLoading }] = useLazyGetProductDataQuery();
+  const [getProduct, { isLoading }] = useLazyGetProductDataQuery();
   // const [trigger, ress] = useLazyGetSimpleDataQuery();
   // if (!isLoading && data) {
   // console.log(data);
   // }
-  const limmiter = 10;
-  const skipp = 0;
+  // const limmiter = 10;
+  // const skipp = 0;
 
   // const {
   //   data: categoriesNewData,
@@ -69,62 +84,50 @@ const MainContent = () => {
   // console.log("isError:", isNewCategoriesError);
   // console.log("error:", error);
   const limit = itemPerPage;
-  const skip = (currentPage - 1) * limit;
+  // const skip = (currentPage - 1) * limit;
+  const skip = (pages - 1) * limit;
   const sort = "title";
   const order = "asc";
   // const skip = (currentPage - 1) * limit;
   // const category = selectedCategory;
   // console.log("data", data);
-  const getProductData = async (
-    limit: number,
-    skip: number,
-    sort: string,
-    order: string
-  ) => {
+  const getProductData = async () => {
     try {
-      const result = await getProduct({ limit, skip, sort, order });
-      // console.log(result?.data?.products);
-      // console.log(data);
-
-      // setProducts(result?.data?.products);
-      if (result && result.data) {
-        // If products are in data.products (as defined in ProductsResponse type)
-        if (result.data.products && Array.isArray(result.data.products)) {
-          setProducts(result.data.products);
-        }
-        // If products are in the main data object
-        // else if (
-        //   result.data.data &&
-        //   result.data.data.products &&
-        //   Array.isArray(result.data.data.products)
-        // ) {
-        //   setProducts(result.data.data.products);
-        // }
-        // If products are directly in the response
-        else if (Array.isArray(result.data)) {
-          setProducts(result.data);
-        }
-        // If products are in the CommonResponseType's products property
-        else if (result.data.products && Array.isArray(result.data.products)) {
-          setProducts(result.data.products);
-        }
-        // Fallback to empty array if structure doesn't match any expected pattern
-        else {
-          console.error("Unexpected data structure:", result);
-          setProducts([]);
-        }
+      const params: Record<string, unknown> = {
+        limit,
+        skip,
+      };
+      if (selectedCategory) {
+        params.category = selectedCategory;
+      } else if (keyword) {
+        params.search = keyword;
       } else {
-        // Handle undefined result or data
-        setProducts([]);
+        params.sort = sort;
+        params.order = order;
       }
+
+      // const result = await getProduct({ limit, skip, sort, order });
+
+      const result = await getProduct(params); //unwrap() is a helper method provided by RTK Query's mutation and query hooks (like useLazyGetProductDataQuery) only on the promise returned by the trigger function (not on the result object itself).
+
+      setProducts(result?.data?.products || []);
+      setTotalItems(result?.data?.total || 0);
+      // setNotification(result?.data?.products || []);
+      // console.log("Products:", notification);
     } catch (error) {
-      console.error("Error fetching products:", error);
+      // console.error("Error fetching products:", error);
+      if (import.meta.env.MODE !== "development") {
+        Sentry.captureException(error);
+      } else {
+        console.error("Caught error:", error);
+      }
       // setProducts([]);
     }
   };
+
   useEffect(() => {
-    getProductData(limit, skip, sort, order);
-  }, []);
+    getProductData();
+  }, [limit, skip, selectedCategory, keyword, sort, order]);
   // useEffect(() => {
   //   if (selectedCategory) {
   //     trigger({ limit, skip, category: selectedCategory });
@@ -144,73 +147,6 @@ const MainContent = () => {
   //     // );
   //   }
   // }, [trigger, limit, skip, selectedCategory, keyword, sort, order]);
-  // useEffect(() => {
-  //   if (data && Array.isArray(data.products)) {
-  //     setProducts(data.products);
-  //     // console.log(data);
-
-  //     // TotalData = data.total;
-  //   } else {
-  //     setProducts([]);
-  //   }
-  // }, [data]);
-
-  //   useEffect(() => {
-  //     let url = `https://dummyjson.com/products?limit=${itemPerPage}&skip=${(currentPage - 1) * itemPerPage}`
-  //     if (keyword) {
-  //         url = `https://dummyjson.com/products/search?q=${keyword}`
-  //     }
-  //     axios.get(url).then(response => {
-  //         setProducts(response.data.products)
-  //         console.log(response.data);
-  //     }).catch(err => {
-  //         console.error('Error fetching the Products', err);
-  //     })
-  // }, [currentPage, keyword])
-
-  // const getSimpleData = async () => {
-  //   // console.log(trigger);
-  //   const response = await trigger({
-  //     limit: 10,
-  //     skip: 10,
-  //   }).unwrap();
-  //   console.log(response);
-  //   // console.log(ress);
-  //   setProducts(response.products);
-  //   console.log(response.products);
-  //   console.log(data?.products);
-  // };
-  // getSimpleData();
-  // const getSimpleData = async() => {
-  //   console.log(data);
-  // // };
-  // useEffect(() => {
-  //   getSimpleData();
-  // }, []);
-
-  // useEffect(() => {
-  //   setLoading(true);
-  // let url = `https://dummyjson.com/products?limit=${itemPerPage}&skip=${
-  //   (currentPage - 1) * itemPerPage
-  //   }`;
-  //   if (keyword) {
-  //     url = `https://dummyjson.com/products/search?q=${keyword}`;
-  //   }
-  //   axios
-  //     .get(url)
-  //     .then((response) => {
-  //       setProducts(response.data.products || []);
-  //       ProductData = response.data.products || [];
-  //       console.log(ProductData);
-  //       // console.log(response);
-
-  //       setLoading(false);
-  //     })
-  //     .catch((err) => {
-  //       console.error("Error fetching the Products", err);
-  //       setLoading(false);
-  //     });
-  // }, [currentPage, keyword]);
 
   const getFilteredProducts = () => {
     let filteredProducts = [...products]; //? [...products] is shallow copy
@@ -254,30 +190,45 @@ const MainContent = () => {
   const filteredProducts = getFilteredProducts();
   // console.log(filteredProducts);
 
-  const totalProducts = 100;
-  const totalPages = Math.ceil(totalProducts / itemPerPage);
+  // const totalProducts = 100;
+  const totalPages = Math.ceil(totalItems / itemPerPage);
+  // const totalPages = Math.ceil(totalProducts / itemPerPage);
   // const totalPages = Math.ceil(TotalData / itemPerPage);
-  const handlePageChange = (page: number) => {
-    if (page > 0 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-  const getPaginationButton = () => {
-    const buttons: number[] = [];
-    let startPage = Math.max(1, currentPage - 2);
-    let endPage = Math.min(totalPages, currentPage + 2);
-    if (currentPage - 2 < 1) {
-      endPage = Math.min(totalPages, endPage + (2 - currentPage - 1));
-    }
-    if (currentPage + 2 > totalPages) {
-      startPage = Math.min(1, startPage - (2 - totalPages - currentPage));
-    }
-    for (let page = startPage; page <= endPage; page++) {
-      buttons.push(page);
-    }
-    return buttons;
-  };
 
+  // const onPageChange = (newPage: number) => {
+  //   setPageChange(newPage);
+  // };
+  const handlePageChanges = (_: React.ChangeEvent<unknown>, value: number) => {
+    setPages(value);
+  };
+  // const handlePageChange = (page: number) => {
+  //   if (page > 0 && page <= totalPages) {
+  //     setCurrentPage(page);
+  //   }
+  // };
+  // const getPaginationButton = () => {
+  //   const buttons: number[] = [];
+  //   let startPage = Math.max(1, currentPage - 2);
+  //   let endPage = Math.min(totalPages, currentPage + 2);
+  //   if (currentPage - 2 < 1) {
+  //     endPage = Math.min(totalPages, endPage + (2 - currentPage - 1));
+  //   }
+  //   if (currentPage + 2 > totalPages) {
+  //     startPage = Math.min(1, startPage - (2 - totalPages - currentPage));
+  //   }
+  //   for (let page = startPage; page <= endPage; page++) {
+  //     buttons.push(page);
+  //   }
+  //   return buttons;
+  // };
+
+  // const handleResetFilters = useCallback(() => {
+  //   dispatch(setSearchQuery(""));
+  //   dispatch(setMinPrice(undefined));
+  //   dispatch(setMaxPrice(undefined));
+  //   dispatch(setKeyword(""));
+  //   dispatch(setSelectedCategory(""));
+  // }, [dispatch]);
   const DrawerList = (
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
       <List>
@@ -329,28 +280,19 @@ const MainContent = () => {
                 </List> */}
     </Box>
   );
-
-  return (
+  if (isLoading) {
+    return <LoadingBackdrop />;
+  }
+  return products.length ? (
     <>
-      {isLoading ? (
-        // <p>Loading........</p>
-        <Backdrop
-          // sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
-          open={true}
-          // onClick={handleClose}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
-      ) : products && products.length > 0 ? (
-        <>
-          <Sidebar />
+      <Sidebar />
 
-          <section className=" ml-60 w-full xl:w-[55rem] lg:w-[55rem] sm:w-[40rem] xs:w-[20rem] pt-2 ">
-            {/* <Container maxWidth={"md"}> */}
-            <Box className="mb-5">
-              <Box className="flex flex-col sm:flex-row justify-between items-center ">
-                <Box className="relative  mb-1 ">
-                  {/* <Button
+      <section className=" ml-60 w-full xl:w-[55rem] lg:w-[55rem] sm:w-[40rem] xs:w-[20rem] pt-2 ">
+        {/* <Container maxWidth={"md"}> */}
+        <Box className="mb-5">
+          <Box className="flex flex-col sm:flex-row justify-between items-center ">
+            <Box className="relative  mb-1 ">
+              {/* <Button
                             variant="text"
                             onClick={() => setDropdownOpen(!dropdownOpen)}
                         >
@@ -359,14 +301,14 @@ const MainContent = () => {
                                 ? 'Filter'
                                 : filter.charAt(0).toLowerCase() + filter.slice(1)}
                         </Button> */}
-                  <Button onClick={toggleDrawer(true)}>
-                    <BubbleChartIcon />
-                    Filter
-                  </Button>
-                  <Drawer open={open} onClose={toggleDrawer(false)}>
-                    {DrawerList}
-                  </Drawer>
-                  {/* {
+              <Button onClick={toggleDrawer(true)}>
+                <BubbleChartIcon />
+                Filter
+              </Button>
+              <Drawer open={open} onClose={toggleDrawer(false)}>
+                {DrawerList}
+              </Drawer>
+              {/* {
                             dropdownOpen && (
                                 <Box className=" bg-white border border-gray-300 rounded mt-2 w-full sm:w-40 ">
                                     <Button
@@ -387,27 +329,63 @@ const MainContent = () => {
 
                                 </Box>
                             )} */}
-                </Box>
-              </Box>
-              <Box className=" grid grid-cols-4  sm:grid-cols-3 md:grid-cols-4 gap-5 ">
-                {/* <Box> */}
+            </Box>
+          </Box>
+          <Box className=" grid grid-cols-4  sm:grid-cols-3 md:grid-cols-4 gap-5 ">
+            {/* <Box> */}
 
-                {filteredProducts.map((product) => (
-                  <Bookcard
-                    key={product.id}
-                    // id={product.id}
-                    // title={product.title || ""}
-                    // // image={product.images[0]}
-                    // image={product.thumbnail || ""}
-                    // // image={...products, thumbnail: `https://picsum.photos/seed/${product.id}/200/300`}
-                    // price={product.price || 0}
-                    // loading={loading}
-                    data={product}
-                  />
-                ))}
-              </Box>
-              <Box className="flex flex-col sm:flex-row justify-between items-center mt-5 pt-7 ">
-                {/* previous */}
+            {filteredProducts.map((product) => (
+              <Bookcard
+                key={product.id}
+                // isLoading={isLoading}
+                isLoading={isLoading}
+                // id={product.id}
+                // title={product.title || ""}
+                // // image={product.images[0]}
+                // image={product.thumbnail || ""}
+                // // image={...products, thumbnail: `https://picsum.photos/seed/${product.id}/200/300`}
+                // price={product.price || 0}
+                // loading={loading}
+                data={product}
+              />
+            ))}
+          </Box>
+          {/* <Box className="pt-5 flex justify-center items-center"> */}
+          <Box
+            sx={{
+              pt: 5,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Pagination
+              count={totalPages}
+              page={pages}
+              onChange={handlePageChanges}
+              size="large"
+              // color="standard"
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  color: "black ",
+                  borderColor: "lightgray",
+                },
+                "& .Mui-selected": {
+                  backgroundColor: "black !important",
+                  color: "white !important",
+                },
+              }}
+            />
+          </Box>
+          {/* <CustomPagination
+                module={notification}
+                page={pageChange}
+                onPageChange={onPageChange}
+                totalPages={totalPages}
+              /> */}
+
+          {/* <Box className="flex flex-col sm:flex-row justify-between items-center mt-5 pt-7 ">
+                previous
                 <Button
                   variant="outlined"
                   color="inherit"
@@ -418,9 +396,9 @@ const MainContent = () => {
                 >
                   Previous
                 </Button>
-                {/* 1,2,3,4,5 */}
+                1,2,3,4,5
                 <Box className="flex flex-wrap justify-center ">
-                  {/* pagination Button */}
+                 pagination Button
                   {getPaginationButton().map((page) => (
                     <Button
                       variant="contained"
@@ -441,7 +419,7 @@ const MainContent = () => {
                     </Button>
                   ))}
                 </Box>
-                {/* next*/}
+                next
                 <Button
                   variant="outlined"
                   color="inherit"
@@ -452,14 +430,16 @@ const MainContent = () => {
                 >
                   Next
                 </Button>
-              </Box>
-            </Box>
-          </section>
-        </>
-      ) : (
-        <p>No Products Found</p>
-      )}
+              </Box> */}
+        </Box>
+      </section>
     </>
+  ) : products.length === 0 ? (
+    <NoProductsFound
+    //  onReset={handleResetFilters}
+    />
+  ) : (
+    <p>No Product</p>
   );
 };
 

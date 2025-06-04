@@ -10,8 +10,8 @@ import { logOut, setCreditionals } from "../reducers/authSlice";
 import { RootState } from "../app/store";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:3500",
-  // baseUrl: import.meta.env.VITE_BACK_URI,
+  // baseUrl: "http://localhost:3500",
+  baseUrl: import.meta.env.VITE_BACK_URI,
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     const state = getState() as RootState;

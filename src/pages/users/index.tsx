@@ -135,7 +135,7 @@ const ManageUsers = () => {
       const body = {
         isBlocked: !users[index]?.isBlocked,
       };
-      console.log(body);
+      // console.log(body);
       // const encryptedData = generateEncryptedKeyBody(body);
       // const response = await updateUserStatus({
       //   id: `${users[index]._id}`,
@@ -166,7 +166,7 @@ const ManageUsers = () => {
     const permission = Object.values(userData?.roles || {}).includes(
       ROLES.ADMIN
     );
-    console.log(permission);
+    // console.log(permission);
     if (permission) {
       // if (permission?.length) {
       // let idx = -1;
@@ -187,12 +187,12 @@ const ManageUsers = () => {
 
     if (hasAdmin) {
       // if (userData?.roles === ROLES.ADMIN) {
-      console.log("Permission Granted");
+      // console.log("Permission Granted");
 
       checkPermission();
       // setList(sideBarData);
     } else {
-      console.log(" Permission Denied");
+      // console.log(" Permission Denied");
     }
   }, []);
   // useEffect(() => {

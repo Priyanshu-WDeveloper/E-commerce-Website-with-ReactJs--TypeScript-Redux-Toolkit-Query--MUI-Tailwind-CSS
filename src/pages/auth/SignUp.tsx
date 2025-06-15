@@ -89,13 +89,13 @@ const SignupForm = () => {
           password: password,
         };
       }
-      console.log("Form Values:", body);
+      // console.log("Form Values:", body);
       try {
         const res = await signup(body).unwrap();
         if (res?.statusCode === 200) {
           showToast("Signup successful! Redirecting to login...", "success");
         }
-        console.log("Signup response:", res);
+        // console.log("Signup response:", res);
 
         navigate("/login");
       } catch (err) {

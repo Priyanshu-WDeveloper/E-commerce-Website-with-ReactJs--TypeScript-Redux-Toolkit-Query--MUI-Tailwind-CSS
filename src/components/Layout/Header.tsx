@@ -42,9 +42,9 @@ const Header = () => {
   const showToast = useToast();
   // const [categoryData] = useLazyGetCategoryListQuery();
   // const [categories, setCategories] = useState<CategoryResponse>([]);
-  console.log("Auth", auth);
+  // console.log("Auth", auth);
   const authhh = useAuth();
-  console.log("Authhhhh", authhh);
+  // console.log("Authhhhh", authhh);
 
   const handleOpenTabCart = () => {
     // dispatch(toggleStatusTab());

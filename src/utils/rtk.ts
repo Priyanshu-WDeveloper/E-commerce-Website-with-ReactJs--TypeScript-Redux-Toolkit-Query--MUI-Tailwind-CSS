@@ -55,7 +55,7 @@ const baseQueryWithReAuth: BaseQueryFn<
       extraOptions
     )) as RefreshResponse;
 
-    console.log("refreshResultt==========", refreshResult);
+    // console.log("refreshResultt==========", refreshResult);
     if (refreshResult?.data && typeof refreshResult.data === "object") {
       // data or token
       // if (refreshResult?.data) {

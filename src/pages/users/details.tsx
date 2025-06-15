@@ -70,7 +70,7 @@ const UserDetails = () => {
     try {
       setLoading(true);
       const response = await getDataById({ id }).unwrap();
-      console.log("response in detail Users", response);
+      // console.log("response in detail Users", response);
 
       setLoading(false);
       if (response.statusCode === 200) {
@@ -78,7 +78,7 @@ const UserDetails = () => {
       }
     } catch (error) {
       setLoading(false);
-      console.log(error);
+      // console.log(error);
     }
   };
 

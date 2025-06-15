@@ -1,6 +1,6 @@
 import { Box, Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useLazyGetUsersQuery } from "../services/Users";
+import { useLazyGetUsersQuery } from "../services/user";
 import { User } from "../types/User";
 import * as Sentry from "@sentry/react";
 

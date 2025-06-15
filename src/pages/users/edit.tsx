@@ -28,7 +28,7 @@ import * as Yup from "yup";
 import {
   useEditUserByIdMutation,
   useLazyGetUserByIdQuery,
-} from "../../services/users";
+} from "../../services/user";
 // import { isEnglishString } from "../../utils/validations";
 import useAuth from "../../hooks/useAuth";
 import { ROLES } from "../../utils/enums";

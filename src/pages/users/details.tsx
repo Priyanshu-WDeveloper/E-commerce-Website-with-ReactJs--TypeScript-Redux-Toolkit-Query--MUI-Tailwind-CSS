@@ -12,7 +12,7 @@ import UserDetailComponent from "../../features/userStaff/userDetail";
 // import { Activities, Contents } from "../../types/General";
 // import Loader from "../../helpers/Loader";
 import LoadingBackdrop from "../../components/Backdrop";
-import { useLazyGetUserByIdQuery } from "../../services/users";
+import { useLazyGetUserByIdQuery } from "../../services/user";
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;

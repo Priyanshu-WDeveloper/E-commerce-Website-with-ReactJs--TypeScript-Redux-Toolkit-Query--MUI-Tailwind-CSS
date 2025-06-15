@@ -28,7 +28,7 @@ import {
   //   useLazyGetUserListQuery,
   //   useChangeUserStatusMutation,
   //   useLazyGetUserCSVQuery,
-} from "../../services/users";
+} from "../../services/Users";
 import { UserResponse } from "../../types/User";
 import useAuth from "../../hooks/useAuth";
 import { useErrorToast, useToast } from "../../helpers/toasts/useToast";

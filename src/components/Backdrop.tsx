@@ -7,9 +7,9 @@ const LoadingBackdrop = () => (
     open
     sx={{
       color: "#fff",
-      // backgroundColor: "rgba(0,0,0,0.5)",
-      backgroundColor: "white",
-      // backdropFilter: "blur(6px)",
+      backgroundColor: "rgba(0,0,0,0.3)",
+      // backgroundColor: "white",
+      backdropFilter: "blur(6px)",
       // zIndex: (theme) => theme.zIndex.modal + 1, // Make it top-level
       zIndex: 9999,
       position: "fixed", // KEY PART

@@ -21,6 +21,10 @@ import OrderConfirmation from "./pages/Checkout";
 import AddressPage from "./components/Address";
 import PaymentPage from "./components/PaymentPage";
 import SignupPage from "./pages/auth/SignUp";
+import ManageUsers from "./pages/users";
+import ProtectedRoute from "./components/ProtectedRoute";
+import UserDetails from "./pages/users/details";
+import UsersForm from "./pages/users/edit";
 // import ShoppingCart from "./components/Cart2";
 function App() {
   return (
@@ -36,6 +40,33 @@ function App() {
           <Route path="product/:id" element={<ProductPage />} />
           {/* </Route> */}
         </Route>
+        <Route
+          path="manage-users"
+          element={
+            <ProtectedRoute>
+              <ManageUsers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manage-users/details/:id"
+          element={
+            <ProtectedRoute>
+              <UserDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manage-users/edit/:id"
+          element={
+            <ProtectedRoute>
+              <UsersForm />
+            </ProtectedRoute>
+          }
+        />
+        {/* <Route path="manage-users/:id" element={<UserDetails />} /> */}
+        {/* <Route path="/user/:id" element={<UserDetails />} /> */}
+
         <Route path="/checkout" element={<Checkout />}>
           <Route index element={<Cart />} />
           <Route path="cart" element={<Cart />} />

@@ -3,7 +3,10 @@ import { RootState } from "../app/store";
 const rememberMe = localStorage.getItem("rememberMe") === "true";
 const storage = rememberMe ? localStorage : sessionStorage;
 const token = storage.getItem("token"); // localstorage X storage _/
-const user = storage.getItem("user");
+const user =
+  storage.getItem("user") && storage.getItem("user") !== "undefined"
+    ? storage.getItem("user")
+    : null;
 
 // console.log("rememberMe", rememberMe);
 // console.log("storage", storage);
@@ -14,13 +17,15 @@ const authSlice = createSlice({
   reducers: {
     setCreditionals: (state, action) => {
       const { user, accessToken, rememberMe } = action.payload;
+      // const { user,  rememberMe } = action.payload;
+      // const accessToken=
+      // console.log("Payload-----------------", action.payload);
+      // console.log("User", user);
+      // console.log("accessToken", accessToken);
 
+      // const username = user.username;
       state.token = accessToken;
       state.user = user;
-      // localStorage.setItem("token", token);
-      // localStorage.setItem("user", JSON.stringify(user));
-      // console.log(rememBerMe);
-      // console.log(rememberMe);
 
       const storage = rememberMe ? localStorage : sessionStorage;
 
@@ -34,10 +39,9 @@ const authSlice = createSlice({
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       localStorage.removeItem("rememberMe");
-
-      // sessionStorage.removeItem("token");
-      // sessionStorage.removeItem("user");
-      sessionStorage.clear();
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("user");
+      // sessionStorage.clear();
     },
   },
 });

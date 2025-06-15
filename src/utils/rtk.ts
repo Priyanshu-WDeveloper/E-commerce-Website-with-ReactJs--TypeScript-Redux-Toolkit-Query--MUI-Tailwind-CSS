@@ -8,15 +8,23 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { logOut, setCreditionals } from "../reducers/authSlice";
 import { RootState } from "../app/store";
+import { API_URL } from "../constants/url";
+
+type RefreshResponse = {
+  data: {
+    data: {
+      accessToken: string;
+    };
+  };
+};
 
 const baseQuery = fetchBaseQuery({
-  // baseUrl: "http://localhost:3500",
-  baseUrl: import.meta.env.VITE_BACK_URI,
+  baseUrl: API_URL,
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     const state = getState() as RootState;
     const token = state?.auth?.token;
-    // console.log(token);
+    // console.log("Token from state:", token);
 
     if (token) {
       headers.set("authorization", `Bearer ${token}`);
@@ -41,19 +49,28 @@ const baseQueryWithReAuth: BaseQueryFn<
 
   // if (result?.error?.originalStatus === 403) {  // not using this because originalStatus is not working so using status ( result?.error?.status)
   if (result?.error?.status === 403) {
-    const refreshResult = await baseQuery("/refresh", api, extraOptions);
-    // console.log("refreshResultt==========", refreshResult);
-    if (refreshResult?.data) {
+    const refreshResult = (await baseQuery(
+      "/refresh",
+      api,
+      extraOptions
+    )) as RefreshResponse;
+
+    console.log("refreshResultt==========", refreshResult);
+    if (refreshResult?.data && typeof refreshResult.data === "object") {
+      // data or token
+      // if (refreshResult?.data) {
       const state = api.getState() as RootState;
       const user = state?.auth?.user;
       // console.log("state", state);
       // console.log("user", user);
       const rememberMe = localStorage.getItem("rememberMe") === "true";
       // console.log(rememberMe);
+      const newToken = refreshResult?.data?.data?.accessToken;
 
       api.dispatch(
         setCreditionals({
-          ...refreshResult.data,
+          // ...refreshResult.data,
+          accessToken: newToken,
           user,
           rememberMe,
         })

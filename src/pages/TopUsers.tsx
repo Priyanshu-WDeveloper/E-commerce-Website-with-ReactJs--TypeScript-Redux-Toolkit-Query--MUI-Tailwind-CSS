@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLazyGetUsersQuery } from "../services/Users";
-import { User } from "../types/userTypes";
+import { User } from "../types/User";
 import * as Sentry from "@sentry/react";
 
 // Define the author type that we'll use for our state

@@ -24,6 +24,9 @@ import { RootState } from "../../app/store";
 // import { useLazyGetCategoryListQuery } from "../../services/ProductData";
 import { logOut, selectCurrentUser } from "../../reducers/authSlice";
 import LongMenu from "../LongMenu";
+import { useToast } from "../../helpers/toasts/useToast";
+import GlassButton from "../Button";
+import useAuth from "../../hooks/useAuth";
 
 const Header = () => {
   const location = useLocation();
@@ -32,11 +35,16 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [totalQuantity, setTotalQuantity] = useState(0);
   // console.log(totalQuantity);
-
+  const accessToken = useSelector((store: RootState) => store.auth.token);
+  const auth = useSelector((store: RootState) => store.auth);
   const carts = useSelector((store: RootState) => store.cart.items);
   const dispatch = useDispatch();
+  const showToast = useToast();
   // const [categoryData] = useLazyGetCategoryListQuery();
   // const [categories, setCategories] = useState<CategoryResponse>([]);
+  console.log("Auth", auth);
+  const authhh = useAuth();
+  console.log("Authhhhh", authhh);
 
   const handleOpenTabCart = () => {
     // dispatch(toggleStatusTab());
@@ -90,8 +98,24 @@ const Header = () => {
   //   dispatch(setSelectedCategory(category));
   // };
 
-  const user = useSelector(selectCurrentUser);
+  let user = useSelector(selectCurrentUser);
+  console.log("user", user);
+
+  user = user
+    ? user?.username?.charAt(0).toUpperCase() + user?.username?.slice(1)
+    : null; // Extract first name from full name or set to null
+
+  // console.log("userrr", user);
+
   const Welcome = user ? `Hello ${user}` : "Welcome Guest";
+  // const Welcome = "Welcome Guest";
+  useEffect(() => {
+    setTimeout(() => {
+      if (accessToken) {
+        showToast(Welcome);
+      }
+    }, 86400000);
+  }, []);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
@@ -202,6 +226,8 @@ const Header = () => {
                 </Button>
               ))}
             </Box>
+            {/*Admin Panel*/}
+            <GlassButton to="/manage-users">Admin Panel</GlassButton>
             <Typography
               variant="h6"
               sx={{
@@ -249,7 +275,7 @@ const Header = () => {
             >
               <LongMenu option={profileOptions} />
             </Box>
-            {user ? (
+            {accessToken ? (
               // <Button onClick={handleLogout} variant="contained">
               //   Logout
               // </Button>

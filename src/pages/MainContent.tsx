@@ -53,6 +53,7 @@ const MainContent = () => {
   // const [notification, setNotification] = useState<Product[]>([]);
   // const [pageChange, setPageChange] = useState(1);
   // const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [open, setOpen] = useState(false);
   const itemPerPage = 12;
@@ -63,7 +64,7 @@ const MainContent = () => {
     useSelector((state: RootState) => state.filter);
   // const { data, isLoading, error } = useGetSimpleDataQuery();
 
-  const [getProduct, { isLoading }] = useLazyGetProductDataQuery();
+  const [getProduct] = useLazyGetProductDataQuery();
   // const [trigger, ress] = useLazyGetSimpleDataQuery();
   // if (!isLoading && data) {
   // console.log(data);
@@ -92,6 +93,7 @@ const MainContent = () => {
   // const category = selectedCategory;
   // console.log("data", data);
   const getProductData = async () => {
+    setIsLoading(true);
     try {
       const params: Record<string, unknown> = {
         limit,
@@ -114,6 +116,7 @@ const MainContent = () => {
       setTotalItems(result?.data?.total || 0);
       // setNotification(result?.data?.products || []);
       // console.log("Products:", notification);
+      setIsLoading(false);
     } catch (error) {
       // console.error("Error fetching products:", error);
       if (import.meta.env.MODE !== "development") {

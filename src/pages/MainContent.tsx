@@ -112,8 +112,8 @@ const MainContent = () => {
 
       const result = await getProduct(params); //unwrap() is a helper method provided by RTK Query's mutation and query hooks (like useLazyGetProductDataQuery) only on the promise returned by the trigger function (not on the result object itself).
 
-      setProducts(result?.data?.products || []);
-      setTotalItems(result?.data?.total || 0);
+      setProducts(result?.data?.data?.products || []);
+      setTotalItems(result?.data?.data?.total || 0);
       // setNotification(result?.data?.products || []);
       // console.log("Products:", notification);
       setIsLoading(false);

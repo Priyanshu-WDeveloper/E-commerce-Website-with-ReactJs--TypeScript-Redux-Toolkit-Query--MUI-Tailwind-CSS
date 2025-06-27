@@ -179,7 +179,7 @@ const UsersForm = () => {
   const getDataByIdList = async () => {
     try {
       const response = await getDataById({ id }).unwrap();
-      console.log(response);
+      // console.log(response);
 
       if (response.statusCode == 200) {
         formik.setFieldValue("firstName", response?.data?.firstName || "");
@@ -195,7 +195,7 @@ const UsersForm = () => {
         );
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 

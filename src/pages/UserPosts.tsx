@@ -76,10 +76,10 @@ const UserPosts = () => {
   const getPostsData = async () => {
     try {
       const response = await getPosts({ limit: 5, skip: 0 }).unwrap();
-      // console.log("response", response);
+      console.log("response", response);
       // const posts = response?.posts || [];
-      if (response?.posts?.length) {
-        const shuffled = shuffleArray(response?.posts);
+      if (response?.data?.posts?.length) {
+        const shuffled = shuffleArray(response?.data?.posts);
 
         setRandomPosts(shuffled);
         const initial: Record<number, Reaction> = {};

@@ -78,7 +78,11 @@ const UserDetails = () => {
       }
     } catch (error) {
       setLoading(false);
+<<<<<<< HEAD
       // console.log(error);
+=======
+      console.error(error);
+>>>>>>> dev
     }
   };
 

@@ -99,7 +99,7 @@ const Header = () => {
   // };
 
   let user = useSelector(selectCurrentUser);
-  console.log("user", user);
+  // console.log("user", user);
 
   user = user
     ? user?.username?.charAt(0).toUpperCase() + user?.username?.slice(1)
@@ -227,7 +227,7 @@ const Header = () => {
               ))}
             </Box>
             {/*Admin Panel*/}
-            <GlassButton to="/manage-users">Admin Panel</GlassButton>
+            {/* <GlassButton to="/manage-users">Admin Panel</GlassButton> */}
             <Typography
               variant="h6"
               sx={{
@@ -265,7 +265,7 @@ const Header = () => {
               </Badge>
               {/* </Box> */}
             </IconButton>
-            <Box
+            {/* <Box
               sx={{
                 position: "relative",
                 zIndex: 1,
@@ -274,7 +274,7 @@ const Header = () => {
               }}
             >
               <LongMenu option={profileOptions} />
-            </Box>
+            </Box> */}
             {accessToken ? (
               // <Button onClick={handleLogout} variant="contained">
               //   Logout

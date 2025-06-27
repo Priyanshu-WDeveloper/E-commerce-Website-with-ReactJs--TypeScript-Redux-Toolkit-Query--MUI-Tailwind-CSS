@@ -28,6 +28,7 @@ const SignupForm = () => {
   const [signup] = useSignupMutation();
   const [loginType, setLoginType] = useState("email");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   // const [showConfirm, setShowConfirm] = useState(false);
   const showToast = useToast();
   const errToast = useErrorToast();
@@ -89,13 +90,13 @@ const SignupForm = () => {
           password: password,
         };
       }
-      console.log("Form Values:", body);
+      // console.log("Form Values:", body);
       try {
         const res = await signup(body).unwrap();
         if (res?.statusCode === 200) {
           showToast("Signup successful! Redirecting to login...", "success");
         }
-        console.log("Signup response:", res);
+        // console.log("Signup response:", res);
 
         navigate("/login");
       } catch (err) {
@@ -189,8 +190,9 @@ const SignupForm = () => {
           {/* Email or Phone */}
           {loginType === "email" ? (
             <TextField
-              label="Email"
               variant="standard"
+              label="Email"
+              // variant="standard"
               fullWidth
               name="email"
               value={formik.values.email}
@@ -283,7 +285,8 @@ const SignupForm = () => {
             <TextField
               label="Confirm Password"
               name="confirmPassword"
-              type="password"
+              // type="password"
+              type={showConfirmPassword ? "text" : "password"}
               variant="standard"
               autoComplete="new-password"
               fullWidth
@@ -303,11 +306,13 @@ const SignupForm = () => {
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       edge="end"
                       sx={{ color: "white" }}
                     >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 ),

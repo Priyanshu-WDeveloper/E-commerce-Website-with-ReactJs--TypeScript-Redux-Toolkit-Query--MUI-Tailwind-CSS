@@ -7,7 +7,7 @@ export const handleDelete = async (
   showToast,
   showError
 ) => {
-  console.log(selectedId);
+  // console.log(selectedId);
 
   if (selectedId) {
     try {

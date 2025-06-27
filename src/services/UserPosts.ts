@@ -6,6 +6,13 @@ type CommonResponseType = {
   statusCode: number;
   message: string;
   total: number;
+  success: boolean;
+  data: {
+    posts: Post[];
+    limit: number;
+    skip: number;
+    total: number;
+  };
 };
 
 const UserPostApi = apiSlicess.injectEndpoints({

@@ -147,11 +147,11 @@ const LoginPage = () => {
         };
       }
 
-      console.log("Form Values:", body);
+      // console.log("Form Values:", body);
 
       try {
         const res = await login(body).unwrap();
-        console.log(res);
+        // console.log(res);
 
         if (res?.statusCode === 200) {
           dispatch(
@@ -284,6 +284,7 @@ const LoginPage = () => {
           {method === "account" ? (
             <TextField
               margin="normal"
+              variant="standard"
               required
               fullWidth
               id="account"

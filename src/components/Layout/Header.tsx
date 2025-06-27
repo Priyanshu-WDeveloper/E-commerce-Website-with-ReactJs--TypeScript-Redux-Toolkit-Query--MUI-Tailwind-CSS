@@ -22,11 +22,17 @@ import { RootState } from "../../app/store";
 // import { setSelectedCategory } from "../../reducers/FilterSlice";
 // import { CategoryResponse } from "../../types/productTypes";
 // import { useLazyGetCategoryListQuery } from "../../services/ProductData";
-import { logOut, selectCurrentUser } from "../../reducers/authSlice";
-import LongMenu from "../LongMenu";
-import { useToast } from "../../helpers/toasts/useToast";
-import GlassButton from "../Button";
+import { logOut } from "../../reducers/authSlice";
+// import LongMenu from "../LongMenu";
+import GlassButton from "../Buttons/Button";
 import useAuth from "../../hooks/useAuth";
+import { showToast } from "../../helpers/toast";
+// import ProfileDropdown from "../LongMenu2";
+// import HoverProfileWrapper from "../HoverProfileWrapper";
+import LongMenu from "../LongMenu";
+import { Analytics, Login, Logout, Person } from "@mui/icons-material";
+// import { useAppSelector } from "../../hooks/store";
+import InfoIcon from "@mui/icons-material/Info";
 
 const Header = () => {
   const location = useLocation();
@@ -36,16 +42,44 @@ const Header = () => {
   const [totalQuantity, setTotalQuantity] = useState(0);
   // console.log(totalQuantity);
   const accessToken = useSelector((store: RootState) => store.auth.token);
-  const auth = useSelector((store: RootState) => store.auth);
+  // const auth = useSelector((store: RootState) => store.auth);
   const carts = useSelector((store: RootState) => store.cart.items);
   const dispatch = useDispatch();
-  const showToast = useToast();
   // const [categoryData] = useLazyGetCategoryListQuery();
   // const [categories, setCategories] = useState<CategoryResponse>([]);
   // console.log("Auth", auth);
-  const authhh = useAuth();
+  const { username, email } = useAuth() || {};
   // console.log("Authhhhh", authhh);
+  // const clearCloseTimeout = useCallback((): void => {
+  //   if (timeoutRef.current) {
+  //     clearTimeout(timeoutRef.current);
+  //     timeoutRef.current = null;
+  //   }
+  // }, []);
 
+  // const setCloseTimeout = useCallback((): void => {
+  //   timeoutRef.current = setTimeout(() => {
+  //     setAnchorEl(null);
+  //   }, 150);
+  // }, []);
+  // const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  // const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // const containerRef = useRef<HTMLDivElement>(null);
+  // const handleContainerMouseEnter = useCallback(
+  //   (event: React.MouseEvent<HTMLElement>): void => {
+  //     clearCloseTimeout();
+  //     if (!open) {
+  //       setAnchorEl(
+  //         event.currentTarget.querySelector("button") || event.currentTarget
+  //       );
+  //     }
+  //   },
+  //   [open, clearCloseTimeout]
+  // );
+
+  // const handleContainerMouseLeave = useCallback((): void => {
+  //   setCloseTimeout();
+  // }, [setCloseTimeout]);
   const handleOpenTabCart = () => {
     // dispatch(toggleStatusTab());
     navigate("/checkout/cart");
@@ -79,11 +113,63 @@ const Header = () => {
     { text: "About", path: "/about" },
     { text: "Contact", path: "/contact" },
   ];
+  // const profileOptions = [
+  //   { text: "Analytics", path: "/analytics" },
+  //   { text: "About", path: "/about" },
+  //   { text: "Login", path: "/login" },
+  // ];
   const profileOptions = [
-    { text: "Analytics", path: "/analytics" },
-    { text: "About", path: "/about" },
-    { text: "Login", path: "/login" },
+    {
+      text: "Analytics",
+      path: "/analytics",
+      icon: <Analytics fontSize="small" />,
+    },
+    { text: "About", path: "/about", icon: <InfoIcon fontSize="small" /> },
+    { text: "Contact Us", path: "/contact", icon: <Person fontSize="small" /> },
+
+    ...(accessToken
+      ? [
+          {
+            text: "Logout",
+            path: "", // Provide an empty string to satisfy the type
+            icon: <Logout fontSize="small" color="error" />,
+            action: handleLogout,
+          },
+        ]
+      : [
+          {
+            text: "Login",
+            path: "/login",
+            icon: <Login fontSize="small" color="error" />,
+          },
+        ]),
   ];
+  // const profileOptions = [
+  //   {
+  //     text: "Analytics",
+  //     path: "/analytics",
+  //     icon: <Analytics fontSize="small" />,
+  //   },
+  //   { text: "About", path: "/about", icon: <Person fontSize="small" /> },
+
+  //   ...(accessToken
+  //     ? [
+  //         {
+  //           text: "Logout",
+  //           path: "", // Provide an empty string to satisfy the type
+  //           icon: <Logout fontSize="small" color="error" />,
+  //           action: handleLogout,
+  //         },
+  //       ]
+  //     : [
+  //         {
+  //           text: "Login",
+  //           path: "/login",
+  //           icon: <Login fontSize="small" color="error" />,
+  //         },
+  //       ]),
+  // ];
+
   // const getCategories = async () => {
   //   const data = await categoryData().unwrap();
   //   // console.log("categoryData", data);
@@ -98,11 +184,13 @@ const Header = () => {
   //   dispatch(setSelectedCategory(category));
   // };
 
-  let user = useSelector(selectCurrentUser);
-  console.log("user", user);
+  // let user = useSelector(selectCurrentUser);
+  // let user = useAppSelector(selectCurrentUser);
 
-  user = user
-    ? user?.username?.charAt(0).toUpperCase() + user?.username?.slice(1)
+  // console.log("user", user);
+
+  const user = username
+    ? username?.charAt(0).toUpperCase() + username?.slice(1)
     : null; // Extract first name from full name or set to null
 
   // console.log("userrr", user);
@@ -122,12 +210,16 @@ const Header = () => {
         position="fixed"
         elevation={0}
         sx={{
-          background:
-            location.pathname === "/" && !isScrolled
-              ? "transparent"
-              : "rgba(0, 0, 0, 0.8)",
+          // background:
+          //   location.pathname === "/" && !isScrolled
+          //     ? "transparent"
+          //     : "rgba(0, 0, 0, 0.8)",
+          background: "white",
           transition: "background 0.3s ease",
           color: "white",
+          boxShadow: "1px 1px 5px rgba(0, 0, 0, 0.1)",
+          // display: "flex",
+          // justifyContent: "space-between",
         }}
       >
         <Container maxWidth="xl">
@@ -140,7 +232,7 @@ const Header = () => {
               onClick={handleDrawerToggle}
               sx={{
                 display: { sm: "none" },
-                color: "white",
+                // color: "white",
                 "&:hover": {
                   background: "rgba(255, 255, 255, 0.1)",
                 },
@@ -172,7 +264,8 @@ const Header = () => {
                 component={Link}
                 to="/"
                 sx={{
-                  color: "white",
+                  color: "black",
+                  // color: "white",
                   textDecoration: "none",
                   fontWeight: 600,
                   letterSpacing: "1px",
@@ -189,7 +282,7 @@ const Header = () => {
                 flexGrow: 1,
                 gap: "20px",
                 justifyContent: "center",
-                backgroundColor: "transparent",
+                // backgroundColor: "transparent",
                 padding: "8px",
                 borderRadius: "30px",
               }}
@@ -200,7 +293,9 @@ const Header = () => {
                   component={Link}
                   to={item.path}
                   sx={{
-                    color: "white",
+                    // color: "white",
+                    color: "black",
+                    fontWeight: 900,
                     textTransform: "none",
                     fontSize: "1rem",
                     padding: "6px 16px",
@@ -215,9 +310,11 @@ const Header = () => {
                       transform: "translateY(-2px)",
                     },
                     "&.active": {
-                      background: "rgba(218, 165, 32, 0.2)",
-                      border: "1px solid goldenrod",
-                      color: "goldenrod",
+                      background: "black",
+                      color: "white",
+                      // border: "1px solid goldenrod",
+                      // background: "rgba(218, 165, 32, 0.2)",
+                      // color: "goldenrod",
                     },
                   }}
                   className={location.pathname === item.path ? "active" : ""}
@@ -228,7 +325,7 @@ const Header = () => {
             </Box>
             {/*Admin Panel*/}
             <GlassButton to="/manage-users">Admin Panel</GlassButton>
-            <Typography
+            {/* <Typography
               variant="h6"
               sx={{
                 paddingInline: "10px",
@@ -236,24 +333,29 @@ const Header = () => {
                 borderBottom: "2px solid white",
               }}
             >
-              {/* Hello User */}
+               Hello User 
               {Welcome}
-            </Typography>
+            </Typography> */}
             {/* Cart Icon */}
             <IconButton
               onClick={handleOpenTabCart}
               sx={{
-                color: "white",
+                width: 36,
+                height: 36,
+                // color: "white",
                 background: "rgba(255, 255, 255, 0.1)",
                 backdropFilter: "blur(5px)",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
+                border: "1px solid black",
+                // border: "1px solid rgba(255, 255, 255, 0.2)",
                 transition: "all 0.3s ease",
-                marginRight: "5px",
+                marginInline: "5px",
                 "&:hover": {
-                  background: "rgba(255, 255, 255, 0.2)",
+                  color: "white",
+                  background: "black",
                   border: "1px solid rgba(255, 255, 255, 0.3)",
                   transform: "translateY(-2px)",
-                  color: "goldenrod",
+                  // color: "goldenrod",
+                  // background: "rgba(255, 255, 255, 0.2)",
                 },
               }}
             >
@@ -265,7 +367,7 @@ const Header = () => {
               </Badge>
               {/* </Box> */}
             </IconButton>
-            <Box
+            {/* <Box
               sx={{
                 position: "relative",
                 zIndex: 1,
@@ -273,9 +375,45 @@ const Header = () => {
                 isolation: "isolate", // Isolate this component to create a new stacking context
               }}
             >
-              <LongMenu option={profileOptions} />
-            </Box>
-            {accessToken ? (
+              <LongMenu option={profileOptions} /> 
+              
+            </Box> */}
+            {/* <Box
+              ref={containerRef}
+              // onMouseEnter={handleContainerMouseEnter}
+              onMouseEnter={(e) => {
+                clearCloseTimeout();
+                setAnchorEl(
+                  e.currentTarget.querySelector("button") || e.currentTarget
+                );
+              }}
+              onMouseLeave={() => {
+                setCloseTimeout();
+              }}
+              // onMouseLeave={handleContainerMouseLeave}
+              sx={{ display: "inline-block" }}
+            >
+              <ProfileDropdown
+                anchorEl={anchorEl}
+                setAnchorEl={setAnchorEl}
+                userName="John Doe"
+                userEmail="john@example.com"
+                avatarUrl="/path/to/avatar.jpg"
+                notificationCount={3}
+                onProfileClick={() => navigate("/profile")}
+                onOrdersClick={() => navigate("/orders")}
+                onWishlistClick={() => navigate("/wishlist")}
+                onAnalyticsClick={() => navigate("/analytics")}
+                onLogoutClick={() => handleLogout()}
+              />
+            </Box> */}
+            {/* <HoverProfileWrapper /> */}
+            <LongMenu
+              options={profileOptions}
+              userName={Welcome}
+              userEmail={email}
+            />
+            {/* {accessToken ? (
               // <Button onClick={handleLogout} variant="contained">
               //   Logout
               // </Button>
@@ -338,7 +476,7 @@ const Header = () => {
               >
                 Login
               </Button>
-            )}
+            )} */}
 
             {/* </IconButton> */}
           </Toolbar>

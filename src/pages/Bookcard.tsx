@@ -11,8 +11,9 @@ import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { addToCart } from "../reducers/cart";
 // import { RootState } from "../app/store";
-import { useToast } from "../helpers/toasts/useToast";
 import { CartItemProps } from "../types/productTypes";
+import { showToast } from "../helpers/toast";
+import OrderButton from "../components/Buttons/OrderButton";
 // import { Product } from "../types/ProductTypes";
 
 const Bookcard = (props: CartItemProps) => {
@@ -33,7 +34,6 @@ const Bookcard = (props: CartItemProps) => {
 
   // const carts = useSelector((store: RootState) => store.cart.items);
 
-  const showToast = useToast();
   // const showError = useErrorToast();
   const dispatch = useDispatch();
   const handleAddToCart = () => {
@@ -182,7 +182,7 @@ const Bookcard = (props: CartItemProps) => {
               >
                 ${price}
               </Typography>
-              <Button
+              {/* <Button
                 className="bg-black rounded-2xl"
                 sx={{
                   backgroundColor: "black",
@@ -203,7 +203,13 @@ const Bookcard = (props: CartItemProps) => {
                 onClick={handleAddToCart}
               >
                 Add to Cart
-              </Button>
+              </Button> */}
+              <OrderButton
+                sx={{ width: "90px", height: "30px", fontSize: "11px" }}
+                onClick={handleAddToCart}
+              >
+                Add to Cart
+              </OrderButton>
             </Box>
 
             {/* <Typography

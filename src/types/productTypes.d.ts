@@ -56,7 +56,14 @@ export interface ProductData {
     barcode: string;
     qrCode: string;
   };
-  reviews: any[];
+  // reviews: any[];
+  reviews: {
+    reviewerName: string;
+    reviewerEmail: string;
+    rating: number;
+    date: Date;
+    comment: string;
+  };
   weight?: number;
 }
 export type CategoryResponse = string[];

@@ -24,25 +24,39 @@ import {
   // addToCart,
   changeQuantity,
   clearCart,
+  selectCartTotal,
   setOrderDetails,
 } from "../reducers/cart";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Product } from "../types/productTypes";
 import { ShoppingCartOutlined } from "@mui/icons-material";
 import { selectCurrentUser } from "../reducers/authSlice";
-import { useErrorToast } from "../helpers/toasts/useToast";
 import AvailableOffers from "./AvailableOffers";
+import { showToast } from "../helpers/toast";
+import calculateSelectedItemsTotals, {
+  findMRP,
+} from "../utils/calculateTotalItems";
+import OrderButton from "./Buttons/OrderButton";
+import AddMinusButton from "./Buttons/AddMinusButton";
+import DeliveryCheckerMUI from "./Cart/DeliveryCheckerMUI";
+import GiftPackageModal from "./Cart/GiftPackageModal";
+import ApplyCouponModal from "./Cart/CouponModal";
+import { useAppSelector } from "../hooks/store";
+// import ApplyCouponModal from "./Cart/ApplyCouponModal";
+// import CouponModal from "./Cart/CouponModal";
 
 const ShoppingCart = () => {
   const navigate = useNavigate();
   const user = useSelector(selectCurrentUser);
-  const showToast = useErrorToast();
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [donationAmount, setDonationAmount] = useState<string | null>(null);
   const [donateEnabled, setDonateEnabled] = useState(false);
+  const [giftModalOpen, setGiftModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
   const items = useSelector((store: RootState) => store.cart.items);
   // State for the component
   // console.log(items);
+  const totalAmount = useAppSelector(selectCartTotal);
 
   const dispatch = useDispatch();
 
@@ -101,14 +115,14 @@ const ShoppingCart = () => {
   //   return acc + (item.price ?? 0) * item.quantity;
   //   // return acc + (p?.price ?? 0) * item.quantity;
   // }, 0);
-  function findMRP(discountedPrice: number, discountPercent: number): number {
-    if (discountPercent >= 100) {
-      throw new Error("Discount cannot be 100% or more");
-    }
+  // function findMRP(discountedPrice: number, discountPercent: number): number {
+  //   if (discountPercent >= 100) {
+  //     throw new Error("Discount cannot be 100% or more");
+  //   }
 
-    const mrp = discountedPrice / (1 - discountPercent / 100);
-    return parseFloat(mrp.toFixed(2));
-  }
+  //   const mrp = discountedPrice / (1 - discountPercent / 100);
+  //   return parseFloat(mrp.toFixed(2));
+  // }
   // const totalDiscounted = items.reduce((acc, item) => {
   //   return (
   //     acc +
@@ -126,51 +140,61 @@ const ShoppingCart = () => {
   // };
 
   // Calculate totals for selected items only
-  const calculateSelectedItemsTotals = () => {
-    const selectedItemsData = items.filter((item) =>
-      selectedItems.includes(item.id)
+  // const calculateSelectedItemsTotals = () => {
+  //   const selectedItemsData = items.filter((item) =>
+  //     selectedItems.includes(item.id)
+  //   );
+
+  //   const selectedTotalPrice = selectedItemsData.reduce(
+  //     (sum, item) => sum + (item.price ?? 0) * item.quantity,
+  //     0
+  //   );
+
+  //   const selectedTotalDiscount = selectedItemsData.reduce(
+  //     (acc, item) =>
+  //       acc +
+  //       (((item.price ?? 0) * item.discountPercentage) / 100) * item.quantity,
+  //     0
+  //   );
+  //   const selectedTotalDiscount2 = selectedItemsData.reduce((acc, item) => {
+  //     if (!item.price) return acc; // Skip if price missing
+
+  //     // Calculate MRP from discounted price & discount percentage
+  //     const mrp = findMRP(item.price, item.discountPercentage);
+
+  //     // Discount per unit = MRP - discounted price
+  //     const discountPerUnit = mrp - item.price;
+
+  //     // Add total discount for this item (discount per unit * quantity)
+  //     return acc + discountPerUnit * item.quantity;
+  //   }, 0);
+  //   const selectedTotalMRP = selectedItemsData.reduce((acc, item) => {
+  //     if (!item.price) return acc; // Skip if price missing
+  //     // Calculate MRP from discounted price & discount percentage
+  //     return acc + findMRP(item.price, item.discountPercentage) * item.quantity;
+  //   }, 0);
+  //   return {
+  //     selectedTotalPrice,
+  //     selectedTotalDiscount,
+  //     selectedTotalDiscount2,
+  //     // selectedTotalMRP: selectedTotalPrice + selectedTotalDiscount,
+  //     selectedTotalMRP,
+  //     selectedTotalAmount:
+  //       selectedTotalPrice +
+  //       platformFee +
+  //       (donationAmount ? Number(donationAmount) : 0),
+  //   };
+  // };
+  const { selectedTotalAmount, selectedTotalDiscount2, selectedTotalMRP } =
+    calculateSelectedItemsTotals(
+      items,
+      selectedItems,
+      platformFee,
+      donationAmount
     );
-
-    const selectedTotalPrice = selectedItemsData.reduce(
-      (sum, item) => sum + (item.price ?? 0) * item.quantity,
-      0
-    );
-
-    const selectedTotalDiscount = selectedItemsData.reduce(
-      (acc, item) =>
-        acc +
-        (((item.price ?? 0) * item.discountPercentage) / 100) * item.quantity,
-      0
-    );
-    const selectedTotalDiscount2 = selectedItemsData.reduce((acc, item) => {
-      if (!item.price) return acc; // Skip if price missing
-
-      // Calculate MRP from discounted price & discount percentage
-      const mrp = findMRP(item.price, item.discountPercentage);
-
-      // Discount per unit = MRP - discounted price
-      const discountPerUnit = mrp - item.price;
-
-      // Add total discount for this item (discount per unit * quantity)
-      return acc + discountPerUnit * item.quantity;
-    }, 0);
-    const selectedTotalMRP = selectedItemsData.reduce((acc, item) => {
-      if (!item.price) return acc; // Skip if price missing
-      // Calculate MRP from discounted price & discount percentage
-      return acc + findMRP(item.price, item.discountPercentage) * item.quantity;
-    }, 0);
-    return {
-      selectedTotalPrice,
-      selectedTotalDiscount,
-      selectedTotalDiscount2,
-      // selectedTotalMRP: selectedTotalPrice + selectedTotalDiscount,
-      selectedTotalMRP,
-      selectedTotalAmount:
-        selectedTotalPrice +
-        platformFee +
-        (donationAmount ? Number(donationAmount) : 0),
-    };
-  };
+  console.log(items);
+  // console.log(items.id);
+  // console.log(items.id);
 
   const handlePlaceOrder = () => {
     if (selectedItems.length === 0) {
@@ -184,7 +208,7 @@ const ShoppingCart = () => {
       );
       const selectedOrderPayload = {
         items: selectedItemsData,
-        total: calculateSelectedItemsTotals().selectedTotalAmount,
+        total: selectedTotalAmount,
       };
 
       // dispatch(setOrderDetails(orderPayload));
@@ -197,6 +221,8 @@ const ShoppingCart = () => {
       showToast("Please Login First");
     }
   };
+  const handleOpenGiftModal = () => setGiftModalOpen(true);
+  const handleCloseGiftModal = () => setGiftModalOpen(false);
   if (items.length === 0) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" p={2}>
@@ -217,9 +243,12 @@ const ShoppingCart = () => {
             <Typography variant="body2" color="text.secondary" mt={1} mb={3}>
               Looks like you haven’t added anything yet. Let’s fix that!
             </Typography>
-            <Button variant="contained" onClick={() => navigate("/menu")}>
+            {/* <Button variant="contained" onClick={() => navigate("/menu")}>
               Browse Products
-            </Button>
+            </Button> */}
+            <OrderButton onClick={() => navigate("/menu")}>
+              Browse Products
+            </OrderButton>
           </CardContent>
         </Card>
       </Box>
@@ -245,7 +274,9 @@ const ShoppingCart = () => {
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
           {/* Delivery time check */}
-          <Paper sx={{ p: 2, mb: 2, bgcolor: "#FFF8F8" }}>
+          <DeliveryCheckerMUI />
+
+          {/* <Paper sx={{ p: 2, mb: 2, bgcolor: "#FFF8F8" }}>
             <Box
               display="flex"
               justifyContent="space-between"
@@ -258,7 +289,7 @@ const ShoppingCart = () => {
                 ENTER PIN CODE
               </Button>
             </Box>
-          </Paper>
+          </Paper> */}
 
           {/* Available offers */}
           <AvailableOffers />
@@ -398,7 +429,7 @@ const ShoppingCart = () => {
                     </Box>
                   </Box> */}
                   <Box className="w-20 mt-2  flex justify-center gap-2">
-                    <Button
+                    {/* <Button
                       sx={{
                         width: "24px",
                         height: "24px",
@@ -417,9 +448,13 @@ const ShoppingCart = () => {
                     >
                       {" "}
                       -
-                    </Button>
+                    </Button> */}
+                    <AddMinusButton onClick={() => handleMinus(item)}>
+                      {" "}
+                      -
+                    </AddMinusButton>
                     <span>{item.quantity} </span>
-                    <Button
+                    {/* <Button
                       sx={{
                         width: "24px",
                         height: "24px",
@@ -437,7 +472,10 @@ const ShoppingCart = () => {
                       onClick={() => handlePlus(item)}
                     >
                       +
-                    </Button>
+                    </Button> */}
+                    <AddMinusButton onClick={() => handlePlus(item)}>
+                      +
+                    </AddMinusButton>
                   </Box>
                   <Box display="flex" alignItems="center" mt={1}>
                     <Typography variant="body1" fontWeight="bold" mr={1}>
@@ -475,6 +513,7 @@ const ShoppingCart = () => {
         <Grid item xs={12} md={4}>
           {/* Right Section */}
           {/* Coupons section */}
+
           <Paper sx={{ p: 2, mb: 2 }}>
             <Typography
               variant="subtitle1"
@@ -495,20 +534,40 @@ const ShoppingCart = () => {
                   Apply Coupons
                 </Typography>
               </Box>
-              <Button
-                onClick={() => alert("This Feature is coming soon!")}
+
+              {/* <Button
                 variant="outlined"
                 size="small"
                 color="error"
+                onClick={() => setModalOpen(true)}
               >
-                APPLY
+                Apply Coupon
+              </Button> */}
+              <Button variant="outlined" onClick={() => setModalOpen(true)}>
+                Enter Coupon
               </Button>
+              {/* <CouponModal
+                open={modalOpen}
+                handleClose={() => setModalOpen(false)}
+              /> */}
+              <ApplyCouponModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                cartTotal={totalAmount}
+              />
             </Box>
             {!user ? (
               <Box display="flex" alignItems="center">
-                <Typography variant="body2" color="error.main" mr={1}>
+                <Typography
+                  component={NavLink}
+                  to="/login"
+                  variant="body2"
+                  color="error.main"
+                  mr={1}
+                >
                   Login
                 </Typography>
+                {/* <NavLink to="/login">Login</NavLink> */}
                 <Typography variant="body2">
                   to get upto ₹300 OFF on first order
                 </Typography>
@@ -517,8 +576,13 @@ const ShoppingCart = () => {
               ""
             )}
           </Paper>
+          {/* <ApplyCouponModal
+            open={modalOpen}
+            onClose={() => setModalOpen(false)}
+          /> */}
 
           {/* Gifting section */}
+
           <Paper sx={{ p: 2, mb: 2 }}>
             <Typography
               variant="subtitle1"
@@ -537,7 +601,7 @@ const ShoppingCart = () => {
                   Gift Packaging and personalised message on card, Only for ₹35
                 </Typography>
                 <Button
-                  onClick={() => alert("This Feature is coming soon!")}
+                  onClick={handleOpenGiftModal}
                   variant="text"
                   color="error"
                   sx={{ pl: 0 }}
@@ -548,7 +612,12 @@ const ShoppingCart = () => {
             </Box>
           </Paper>
 
+          <GiftPackageModal
+            open={giftModalOpen}
+            onClose={handleCloseGiftModal}
+          />
           {/* Donation section */}
+
           <Paper sx={{ p: 2, mb: 2 }}>
             {/* <Button variant="text" color="error" sx={{ pl: 0 }}>
               Know More
@@ -617,8 +686,7 @@ const ShoppingCart = () => {
                   <Typography variant="body2">
                     {/* ₹{totalMRP.toLocaleString()} */}
                     {/* {`${(cartTotalPrice + totalDiscounted).toFixed(2)}`} */}
-                    $
-                    {calculateSelectedItemsTotals().selectedTotalMRP.toFixed(2)}
+                    ${selectedTotalMRP.toFixed(2)}
                   </Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between" mb={1}>
@@ -659,9 +727,7 @@ const ShoppingCart = () => {
                   }, 0)
                   .toFixed(2)} */}
                     -$
-                    {calculateSelectedItemsTotals().selectedTotalDiscount2.toFixed(
-                      2
-                    )}
+                    {selectedTotalDiscount2.toFixed(2)}
                   </Typography>
                 </Box>
                 {/* <Box display="flex" justifyContent="space-between" mb={1}>
@@ -698,10 +764,7 @@ const ShoppingCart = () => {
                     Total Amount
                   </Typography>
                   <Typography variant="subtitle1" fontWeight="bold">
-                    {/* ${TotalAmount} */}$
-                    {calculateSelectedItemsTotals().selectedTotalAmount.toFixed(
-                      2
-                    )}
+                    {/* ${TotalAmount} */}${selectedTotalAmount.toFixed(2)}
                   </Typography>
                 </Box>
                 <Button

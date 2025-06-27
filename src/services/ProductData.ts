@@ -10,8 +10,8 @@ import { END_POINTS } from "../constants/url";
 type CommonResponseType = {
   statusCode: number;
   message: string;
-  products: Product[];
-  total: number;
+  products?: Product[];
+  total?: number;
   // data: {
   //   products?: any;
   // };
@@ -63,7 +63,10 @@ export const ProductDataApi = apiSlicess.injectEndpoints({
         };
       },
     }),
-    getProductDataById: builder.query<ProductData, { id: string }>({
+    getProductDataById: builder.query<
+      CommonResponseType & { data: ProductData },
+      { id: string }
+    >({
       // using only ProductData bcause we are using it in the query
       query: ({ id }) => ({
         url: `${END_POINTS.products}/${id}`,
@@ -78,7 +81,10 @@ export const ProductDataApi = apiSlicess.injectEndpoints({
         return { url: END_POINTS.products, method: "GET" };
       },
     }),
-    getCategoryList: builder.query<CategoryResponse, void>({
+    getCategoryList: builder.query<
+      CommonResponseType & { data: CategoryResponse },
+      void
+    >({
       //response.products
       query: () => ({
         url: `${END_POINTS.products}/category-list`,

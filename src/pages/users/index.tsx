@@ -17,6 +17,7 @@ import {
   Button,
   Tooltip,
   Container,
+  Pagination,
 } from "@mui/material";
 import { useNavigate } from "react-router";
 // import SearchBar from "../../components/SearchBar";
@@ -31,7 +32,6 @@ import {
 } from "../../services/user";
 import { UserResponse } from "../../types/User";
 import useAuth from "../../hooks/useAuth";
-import { useErrorToast, useToast } from "../../helpers/toasts/useToast";
 import LoadingBackdrop from "../../components/Backdrop";
 // import { UserResponse } from "../../types/User";
 // import { generateEncryptedKeyBody } from "../../utils/crypto";
@@ -47,6 +47,7 @@ import moment from "moment";
 import WarnModal from "../../components/modals/WarnModal";
 import { handleDelete } from "../../utils/commonFunctions";
 import { isDeleteAllowed, isEditAllowed } from "../../utils/permissionAllowed";
+import { errToast, showToast } from "../../helpers/toast";
 // import useAuth from "../../hooks/useAuth";
 
 interface Permissions {
@@ -76,8 +77,6 @@ const ManageUsers = () => {
   const [getUsers, { isLoading }] = useLazyGetUsersQuery();
   //   const [updateUserStatus] = useChangeUserStatusMutation();
   const [deleteById] = useDeleteUserByIdMutation();
-  const showToast = useToast();
-  const showError = useErrorToast();
 
   const totalPages = Math.ceil(totalCount / 10);
 
@@ -91,7 +90,7 @@ const ManageUsers = () => {
 
     try {
       const response = await getUsers({
-        limit: 10,
+        limit: 0,
         skip: 0,
         // page,
         // role: ROLES.USER,
@@ -101,13 +100,15 @@ const ManageUsers = () => {
 
       if (response?.statusCode === 200) {
         setUsers(response?.data?.list || []);
-        setTotalCount(response?.data?.totalCount || 1);
+        setTotalCount(response?.data?.totalCount);
+        console.log(response?.data?.totalCount);
+
         // setUsers(response?.data?.list || []);
       } else {
         setUsers([]);
       }
     } catch (error: any) {
-      showError(error?.data?.message || "");
+      errToast(error?.data?.message || "");
       // showError(error?.data?.message || "");
     }
     // setIsLoading(false);
@@ -155,7 +156,7 @@ const ManageUsers = () => {
       // }
       showToast("Status change functionality not implemented yet");
     } catch (error: any) {
-      showError(error?.data?.message || "");
+      errToast(error?.data?.message || "");
     }
   };
   // console.log("userData", userData);
@@ -205,7 +206,9 @@ const ManageUsers = () => {
   //   console.log("hidePermission", hidePermission);
   //   console.log(hidePermission);
   // }, [hidePermission, userData]);
-
+  const handlePageChanges = (_: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+  };
   useEffect(() => {
     getUsersList();
     //   }, [debouncedSearchTerm, page]);
@@ -390,6 +393,32 @@ const ManageUsers = () => {
           onPageChange={onPageChange}
           totalPages={totalPages}
         /> */}
+          <Box
+            sx={{
+              pt: 5,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={onPageChange}
+              size="large"
+              // color="standard"
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  color: "black ",
+                  borderColor: "lightgray",
+                },
+                "& .Mui-selected": {
+                  backgroundColor: "black !important",
+                  color: "white !important",
+                },
+              }}
+            />
+          </Box>
           <WarnModal
             setOpen={setOpen}
             open={open}

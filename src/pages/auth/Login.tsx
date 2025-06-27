@@ -30,7 +30,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { setCreditionals } from "../../reducers/authSlice";
 import { ErrorResponse } from "../../types/response";
-import { useToast } from "../../helpers/toasts/useToast";
+import { errToast, showToast } from "../../helpers/toast";
 
 const LoginPage = () => {
   const [loginType, setLoginType] = useState("email");
@@ -40,7 +40,6 @@ const LoginPage = () => {
   // const [showConfirm, setShowConfirm] = useState(false);
   const [login] = useLoginMutation();
   const dispatch = useDispatch();
-  const showToast = useToast();
   // const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -161,7 +160,7 @@ const LoginPage = () => {
               rememberMe,
             })
           );
-          showToast(res.data.message || "Login successful!", "success");
+          showToast(res.data.message || "Login successful!");
           navigate(from, { replace: true });
         }
       } catch (err) {
@@ -172,7 +171,7 @@ const LoginPage = () => {
 
           // if (err.status === 400) {
           const error = err as ErrorResponse;
-          showToast(error.data.message || "Login failed", "error");
+          errToast(error.data.message || "Login failed");
           // }
         }
       }

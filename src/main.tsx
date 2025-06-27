@@ -9,11 +9,12 @@ import {
   StyledEngineProvider,
   ThemeProvider,
 } from "@mui/material";
+import { SnackbarProvider } from "notistack";
 // import { Toaster } from "sonner";
-import { ToastProvider } from "./helpers/toast";
 import App from "./App";
 import theme from "./Theme";
 import * as Sentry from "@sentry/react";
+import SomethingWentWrong from "./components/404";
 
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_DSN,
@@ -26,15 +27,21 @@ Sentry.init({
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Sentry.ErrorBoundary fallback={<h1>Something went wrong</h1>}>
+    <Sentry.ErrorBoundary fallback={<SomethingWentWrong />}>
       <Provider store={store}>
         <StyledEngineProvider injectFirst>
           <ThemeProvider theme={theme}>
             <CssBaseline /> {/* Resets and normalizes styling */}
-            {/* <Toaster position="top-right" duration={4000} theme="light" /> */}
-            <ToastProvider>
+            <SnackbarProvider
+              maxSnack={3}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              autoHideDuration={1000}
+            >
               <App />
-            </ToastProvider>
+            </SnackbarProvider>
             {/* <MainContent /> */}
           </ThemeProvider>
         </StyledEngineProvider>

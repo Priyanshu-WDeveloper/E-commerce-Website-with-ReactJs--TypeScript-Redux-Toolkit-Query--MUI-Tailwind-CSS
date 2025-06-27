@@ -1,255 +1,284 @@
-import * as React from "react";
-import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-// import MoreVertIcon from "@mui/icons-material/MoreVert";
-// import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+import React, { useRef, useCallback } from "react";
+import {
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+  Avatar,
+  Typography,
+  Divider,
+  ListItemIcon,
+  ListItemText,
+  Badge,
+} from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-
 import { useNavigate } from "react-router-dom";
-import { LongMenuProps } from "../types/LongMenu";
-import { Box } from "@mui/material";
-// import { useTimeout } from "../hooks/useTimeout";
 
-const ITEM_HEIGHT = 48;
-// type TimeoutId = ReturnType<typeof setTimeout>;
+interface Option {
+  text: string;
+  path: string;
+  icon?: React.ReactNode;
+  divider?: boolean;
+  badge?: number;
+  action?: () => void; // Optional action for logout or other custom actions
+}
 
-export default function LongMenu({ option }: LongMenuProps) {
+interface ProfileDropdownProps {
+  options: Option[];
+  userName?: string;
+  userEmail?: string;
+  avatarUrl?: string;
+}
+
+const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
+  options = [],
+  userName,
+  userEmail,
+  avatarUrl,
+}) => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // const [hoverTimeout, setHoverTimeout] = React.useState<NodeJS.Timeout | null>(
-  //   null
-  // );
-  // const timeout = useTimeout();
-  // const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-  //   setAnchorEl(event.currentTarget);
-  // };
-  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-  const clearTimeouts = React.useCallback(() => {
+  const clearCloseTimeout = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
   }, []);
-  const handleMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
-    // setAnchorEl(e.target.value)
-    // timeout.clear();
-    clearTimeouts();
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    clearTimeouts();
+
+  const setCloseTimeout = useCallback(() => {
     timeoutRef.current = setTimeout(() => {
       setAnchorEl(null);
-    }, 200);
-    // timeout.set(() => {
-    //   setAnchorEl(null);
-    // }, 200);
-    // setAnchorEl(null);
-    // setHoverTimeout(timeout);
-  };
+    }, 150);
+  }, []);
+
+  const handleMenuMouseEnter = useCallback(() => {
+    clearCloseTimeout();
+  }, [clearCloseTimeout]);
+
+  const handleMenuMouseLeave = useCallback(() => {
+    setCloseTimeout();
+  }, [setCloseTimeout]);
+
   const handleMenuItemClick = (path: string) => {
-    // timeout.clear();
-    clearTimeouts();
-    // handleClose();
+    clearCloseTimeout();
     setAnchorEl(null);
     navigate(path);
   };
-  React.useEffect(() => {
-    return () => {
-      clearTimeouts();
-    };
-  }, [clearTimeouts]);
+
+  const getInitials = (name: string): string =>
+    name
+      .split(" ")
+      .map((w) => w.charAt(0))
+      .join("")
+      .toUpperCase()
+      .slice(1, 3);
 
   return (
     <Box
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleClose}
-      // style={{ display: "inline-block" }}
-      sx={{ display: "inline-block" }}
+      sx={{ display: "inline-block", cursor: "pointer" }}
+      onMouseEnter={(e) => {
+        clearCloseTimeout();
+        setAnchorEl(e.currentTarget);
+      }}
+      onMouseLeave={handleMenuMouseLeave}
     >
       <IconButton
-        aria-label="more"
-        id="long-button"
-        aria-controls={open ? "long-menu" : undefined}
-        aria-expanded={open ? "true" : undefined}
+        size="small"
+        aria-controls={open ? "profile-menu" : undefined}
         aria-haspopup="true"
-        // onClick={handleClick}
-        onMouseEnter={clearTimeouts}
-        onMouseLeave={handleClose}
-        sx={{ color: "white", ml: "5px" }}
-      >
-        {/* <MoreVertIcon /> */}
-        <AccountCircleIcon />
-      </IconButton>
-      <Menu
-        id="long-menu"
-        MenuListProps={{
-          "aria-labelledby": "long-button",
-          // onMouseEnter: () => {},
-          // onMouseEnter: handleMouseEnter,
-          // onMouseLeave: handleClose,
-          onMouseEnter: clearTimeouts, // Stop closing when mouse enters menu
-          onMouseLeave: handleClose, // Start closing when mouse leaves menu
+        aria-expanded={open ? "true" : undefined}
+        sx={{
+          // ml: 2,
+          transition: "all 0.2s ease-in-out",
+          "&:hover": { transform: "scale(1.05)" },
+          color: "white",
         }}
+      >
+        <Badge
+          overlap="circular"
+          color="error"
+          badgeContent={
+            options.some((opt) => opt.badge && opt.badge > 0)
+              ? options.reduce((acc, opt) => acc + (opt.badge ?? 0), 0)
+              : undefined
+          }
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <Avatar
+            src={avatarUrl}
+            sx={{
+              width: 36,
+              height: 36,
+              bgcolor: "inherit",
+              // bgcolor: "primary.main",
+              color: "black",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              border: "1px solid",
+              borderColor: "black",
+              // border: "2px solid",
+              // borderColor: open ? "primary.main" : "transparent",
+              transition: "border-color 0.2s ease-in-out",
+            }}
+          >
+            {!avatarUrl && getInitials(userName ?? "")}
+          </Avatar>
+        </Badge>
+      </IconButton>
+
+      <Menu
         anchorEl={anchorEl}
+        id="profile-menu"
         open={open}
         onClose={() => setAnchorEl(null)}
-        slotProps={{
-          paper: {
-            style: {
-              maxHeight: ITEM_HEIGHT * 4.5,
-              width: "20ch",
-            },
-            onMouseEnter: clearTimeouts,
-            onMouseLeave: handleClose,
-          },
+        MenuListProps={{
+          onMouseEnter: handleMenuMouseEnter,
+          onMouseLeave: handleMenuMouseLeave,
         }}
+        disableAutoFocus
+        disableEnforceFocus
+        disableRestoreFocus
+        disableScrollLock
+        PaperProps={{
+          elevation: 8,
+          sx: {
+            overflow: "visible",
+            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.15))",
+            mt: 1.5,
+            minWidth: 240,
+            borderRadius: 2,
+            "&:before": {
+              content: '""',
+              display: "block",
+              position: "absolute",
+              top: 0,
+              right: 14,
+              width: 10,
+              height: 10,
+              bgcolor: "background.paper",
+              transform: "translateY(-50%) rotate(45deg)",
+              zIndex: 0,
+            },
+          },
+          onMouseEnter: handleMenuMouseEnter,
+          onMouseLeave: handleMenuMouseLeave,
+        }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        {option.map((opt) => (
-          <MenuItem
-            key={opt.text}
-            selected={opt.text === "Pyxis"}
-            onClick={() => handleMenuItemClick(opt.path)}
-          >
-            {opt.text}
-          </MenuItem>
-        ))}
+        {/* User Info Header */}
+        <Box
+          sx={{
+            px: 2,
+            py: 1.5,
+            borderBottom: "1px solid",
+            borderColor: "divider",
+          }}
+        >
+          <Typography variant="subtitle2" fontWeight={600} noWrap>
+            {userName}
+          </Typography>
+          <Typography variant="caption" color="text.secondary" noWrap>
+            {userEmail}
+          </Typography>
+        </Box>
+
+        {/* Menu Items */}
+        {options.flatMap(
+          ({ text, path, icon, divider, badge, action }, index) => {
+            const isLast = index === options.length - 1;
+            const items = [
+              <MenuItem
+                key={text}
+                // onClick={() => handleMenuItemClick(path)}
+                onClick={() => {
+                  if (action) {
+                    action(); // run the logout handler
+                  } else {
+                    navigate(path); // default navigation
+                  }
+                  setAnchorEl(null); // close the menu
+                }}
+                sx={{
+                  py: 1,
+                  px: 2,
+                  "&:hover": { bgcolor: "action.hover" },
+                  ...(isLast && {
+                    px: 2,
+                    py: 1.5,
+                    borderTop: "1px solid",
+                    borderColor: "divider",
+                  }),
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: 36 }}>
+                  {badge && badge > 0 ? (
+                    <Badge badgeContent={badge} color="error" variant="dot">
+                      {icon ?? <AccountCircleIcon fontSize="small" />}
+                    </Badge>
+                  ) : (
+                    icon ?? <AccountCircleIcon fontSize="small" />
+                  )}
+                </ListItemIcon>
+                <ListItemText>
+                  <Typography
+                    variant="body2"
+                    color={text === "Logout" ? "error.main" : "text.primary"}
+                    fontWeight={500}
+                  >
+                    {text}
+                  </Typography>
+                </ListItemText>
+              </MenuItem>,
+            ];
+            // if (divider) {
+            //   items.push(<Divider key={text + "-divider"} sx={{ my: 0.5 }} />);
+            // }
+            if (divider) {
+              items.push(<Divider key={text + "-divider"} sx={{ my: 0.5 }} />);
+            }
+
+            return items;
+          }
+        )}
+        {/* {options.map(({ text, path, icon, divider, badge }, idx) => (
+          <React.Fragment key={text}>
+            <MenuItem
+              onClick={() => handleMenuItemClick(path)}
+              sx={{
+                py: 1,
+                px: 2,
+                "&:hover": { bgcolor: "action.hover" },
+              }}
+            >
+              <ListItemIcon sx={{ minWidth: 36 }}>
+                {badge && badge > 0 ? (
+                  <Badge badgeContent={badge} color="error" variant="dot">
+                    {icon ?? <AccountCircleIcon fontSize="small" />}
+                  </Badge>
+                ) : (
+                  icon ?? <AccountCircleIcon fontSize="small" />
+                )}
+              </ListItemIcon>
+              <ListItemText>
+                <Typography
+                  variant="body2"
+                  color={text === "Logout" ? "error.main" : "text.primary"}
+                  fontWeight={500}
+                >
+                  {text}
+                </Typography>
+              </ListItemText>
+            </MenuItem>
+            {divider && <Divider sx={{ my: 0.5 }} />}
+          </React.Fragment>
+        ))} */}
       </Menu>
     </Box>
   );
-}
+};
 
-// import * as React from "react";
-// import IconButton from "@mui/material/IconButton";
-// import Menu from "@mui/material/Menu";
-// import MenuItem from "@mui/material/MenuItem";
-// import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-
-// import { useNavigate } from "react-router-dom";
-// import { LongMenuProps } from "../types/LongMenu";
-// import { Box } from "@mui/material";
-
-// const ITEM_HEIGHT = 48;
-
-// export default function LongMenu({ option }: LongMenuProps) {
-//   const navigate = useNavigate();
-//   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-//   const open = Boolean(anchorEl);
-//   const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-
-//   // Clear any existing timeouts to prevent conflicts
-//   const clearTimeoutIfExists = React.useCallback(() => {
-//     if (timeoutRef.current) {
-//       clearTimeout(timeoutRef.current);
-//       timeoutRef.current = null;
-//     }
-//   }, []);
-
-//   const handleMouseEnter = (event: React.MouseEvent<HTMLElement>) => {
-//     // Stop event propagation to prevent conflicts with parent components
-//     event.stopPropagation();
-//     clearTimeoutIfExists();
-//     setAnchorEl(event.currentTarget);
-//   };
-
-//   const handleClose = () => {
-//     clearTimeoutIfExists();
-//     timeoutRef.current = setTimeout(() => {
-//       setAnchorEl(null);
-//     }, 150); // Slightly reduced timeout for better responsiveness
-//   };
-
-//   // Direct close without timeout
-//   const handleCloseNow = () => {
-//     clearTimeoutIfExists();
-//     setAnchorEl(null);
-//   };
-
-//   const handleMenuItemClick = (path: string) => {
-//     clearTimeoutIfExists();
-//     setAnchorEl(null);
-//     navigate(path);
-//   };
-
-//   // Ensure no memory leaks by clearing timeout when component unmounts
-//   React.useEffect(() => {
-//     return () => {
-//       clearTimeoutIfExists();
-//     };
-//   }, [clearTimeoutIfExists]);
-
-//   return (
-//     <Box
-//       onMouseEnter={handleMouseEnter}
-//       onMouseLeave={handleClose}
-//       onClick={(e) => e.stopPropagation()}
-//       sx={{
-//         display: "inline-block",
-//         position: "relative", // Establish stacking context
-//         zIndex: open ? 1300 : "auto", // Ensure menu appears above other header elements when open
-//       }}
-//     >
-//       <IconButton
-//         aria-label="more"
-//         id="long-button"
-//         aria-controls={open ? "long-menu" : undefined}
-//         aria-expanded={open ? "true" : undefined}
-//         aria-haspopup="true"
-//         onClick={(e) => {
-//           e.stopPropagation();
-//           open ? handleCloseNow() : handleMouseEnter(e);
-//         }}
-//         sx={{ color: "white", ml: "5px" }}
-//       >
-//         <AccountCircleIcon />
-//       </IconButton>
-//       <Menu
-//         id="long-menu"
-//         MenuListProps={{
-//           "aria-labelledby": "long-button",
-//           onMouseEnter: (e) => {
-//             e.stopPropagation();
-//             clearTimeoutIfExists();
-//           },
-//           onMouseLeave: handleClose,
-//           onClick: (e) => e.stopPropagation(),
-//         }}
-//         anchorEl={anchorEl}
-//         open={open}
-//         onClose={handleCloseNow}
-//         slotProps={{
-//           paper: {
-//             elevation: 8, // Increase elevation for better visibility
-//             style: {
-//               maxHeight: ITEM_HEIGHT * 4.5,
-//               width: "20ch",
-//               zIndex: 1400, // Higher z-index to ensure it appears above other elements
-//             },
-//             onMouseEnter: (e) => {
-//               e.stopPropagation();
-//               clearTimeoutIfExists();
-//             },
-//             onMouseLeave: handleClose,
-//           },
-//         }}
-//         disableAutoFocus={true}
-//         disableEnforceFocus={true}
-//         disablePortal={false}
-//         disableScrollLock={false}
-//       >
-//         {option.map((opt) => (
-//           <MenuItem
-//             key={opt.text}
-//             selected={opt.text === "Pyxis"}
-//             onClick={() => handleMenuItemClick(opt.path)}
-//           >
-//             {opt.text}
-//           </MenuItem>
-//         ))}
-//       </Menu>
-//     </Box>
-//   );
-// }
+export default ProfileDropdown;

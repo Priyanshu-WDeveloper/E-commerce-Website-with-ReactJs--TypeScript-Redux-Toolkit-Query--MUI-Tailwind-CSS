@@ -16,7 +16,7 @@ import Checkout from "./components/Checkout";
 import LoginPage from "./pages/auth/Login";
 import NoProductsFound from "./components/NoProductsFound";
 // import CusBackdrop from "./components/Backdrop";
-import LoadingBackdrop from "./components/Backdrop";
+// import LoadingBackdrop from "./components/Backdrop";
 import OrderConfirmation from "./pages/Checkout";
 import AddressPage from "./components/Address";
 import PaymentPage from "./components/PaymentPage";
@@ -73,13 +73,14 @@ function App() {
           {/* <Route path="cart2" element={<ShoppingCart />} /> */}
           <Route path="address" element={<AddressPage />} />
           <Route path="payment" element={<PaymentPage />} />
-          <Route path="confirmation" element={<OrderConfirmation />} />
+          {/* <Route path="confirmation" element={<OrderConfirmation />} /> */}
         </Route>
+        <Route path="/confirmation" element={<OrderConfirmation />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="*" element={<Pagenotfound />} />
         <Route path="/noProducts" element={<NoProductsFound />} />
-        <Route path="/backdrop" element={<LoadingBackdrop />} />
+        {/* <Route path="/backdrop" element={<LoadingBackdrop />} /> */}
       </Routes>
     </Router>
   );

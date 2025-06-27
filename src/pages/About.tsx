@@ -43,8 +43,10 @@ const AboutUs = () => {
       <Container sx={{ marginTop: "100px" }}>
         <motion.div
           initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
+          viewport={{ once: true }}
         >
           {/* Hero Section */}
           <Box className="hero-section">

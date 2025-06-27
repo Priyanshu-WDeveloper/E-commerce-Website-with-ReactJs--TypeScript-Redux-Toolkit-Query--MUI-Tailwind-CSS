@@ -18,19 +18,17 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import * as Sentry from "@sentry/react";
 import { useSignupMutation } from "../../services/auth";
-import { useErrorToast, useToast } from "../../helpers/toasts/useToast";
 import { ErrorResponse } from "../../types/response";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import parsePhoneNumberFromString from "libphonenumber-js";
+import { errToast, showToast } from "../../helpers/toast";
 
 const SignupForm = () => {
   const [signup] = useSignupMutation();
   const [loginType, setLoginType] = useState("email");
   const [showPassword, setShowPassword] = useState(false);
   // const [showConfirm, setShowConfirm] = useState(false);
-  const showToast = useToast();
-  const errToast = useErrorToast();
   const navigate = useNavigate();
 
   const handleTabChange = (event, newValue) => {

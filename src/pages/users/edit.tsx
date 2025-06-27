@@ -32,9 +32,9 @@ import {
 // import { isEnglishString } from "../../utils/validations";
 import useAuth from "../../hooks/useAuth";
 import { ROLES } from "../../utils/enums";
-import { useErrorToast, useToast } from "../../helpers/toasts/useToast";
 import LoadingBackdrop from "../../components/Backdrop";
 import { isEnglishString } from "../../utils/validations";
+import { errToast, showToast } from "../../helpers/toast";
 
 interface HidePermission {
   label: string;
@@ -46,8 +46,6 @@ interface HidePermission {
 
 const UsersForm = () => {
   const navigate = useNavigate();
-  const showError = useErrorToast();
-  const showToast = useToast();
   const [updateprofile]: any = useEditUserByIdMutation();
   const [error, setError] = useState(false);
   const [country_code, setPhoneCode] = useState("+91");
@@ -168,7 +166,7 @@ const UsersForm = () => {
         }
       } catch (error: any) {
         console.error(error);
-        showError(error?.data?.message);
+        errToast(error?.data?.message);
       } finally {
         setSubmitting(false);
       }

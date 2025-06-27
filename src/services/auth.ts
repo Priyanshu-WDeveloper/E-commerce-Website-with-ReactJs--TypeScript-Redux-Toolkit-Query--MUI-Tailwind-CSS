@@ -5,8 +5,6 @@ const authApi = apiSlicess.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (credentials) => ({
-        // url: "/login",
-        // url: "/auth",
         url: END_POINTS.login,
         method: "POST",
         body: { ...credentials },
@@ -14,8 +12,6 @@ const authApi = apiSlicess.injectEndpoints({
     }),
     signup: builder.mutation({
       query: (credentials) => ({
-        // url: "/login",
-        // url: "/auth",
         url: END_POINTS.signup,
         method: "POST",
         body: { ...credentials },

@@ -352,35 +352,54 @@ const Sidebar = () => {
   // }, [error]);
   const handleFetchCategories = async () => {
     try {
+      // const response = await fetchCategories(undefined, {
+      //   signal: controller.signal,
+      // }).unwrap();
       const response = await fetchCategories().unwrap();
       // console.log(response);
 
       // Update the categories state for the sidebar
-      setCategories(response);
+      // Ensure response is an array
+      if (Array.isArray(response.data)) {
+        setCategories(response.data);
+      } else {
+        console.warn("Categories response is not an array:", response);
+        setCategories([]);
+      }
     } catch (error) {
+      // if (controller.signal.aborted) {
+      //     console.log("Fetch aborted");
+      //     return;
+      //   }
       // console.log(error);
       if (import.meta.env.MODE !== "development") {
         Sentry.captureException(error);
       } else {
         console.error("Caught error:", error);
       }
+      setCategories([]);
     }
   };
   useEffect(() => {
     handleFetchCategories();
+    // const controller = new AbortController();
+
+    // handleFetchCategories(controller);
+    // return () => {
+    //   controller.abort(); // 💣 cancel the fetch if component unmounts
+    // };
   }, []);
 
-  const getRandomCategories = useMemo(() => {
-    //for showing random categories
-    return (categories: string[], count: number) => {
-      const shuffled = [...categories].sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, count);
-    };
-  }, []);
+  // Helper function to get random categories
+  const getRandomCategories = (categories: string[], count: number) => {
+    if (!categories || categories.length === 0) return [];
+    const shuffled = [...categories].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
 
   const randomCategories = useMemo(() => {
     return getRandomCategories(categories, 4);
-  }, [categories, getRandomCategories]);
+  }, [categories]);
 
   const handleMinPriceChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

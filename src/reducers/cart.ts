@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Product } from "../types/productTypes";
 import { ShippingAddress } from "../types/ShippingAdress";
+import { RootState } from "../app/store";
 interface OrderDetails {
   // items: CartItem[];
   items: Product[];
@@ -91,6 +92,13 @@ export const {
   clearCart,
 } = cartSlice.actions;
 export default cartSlice.reducer;
+
+// export const selectCartTotal = (state: RootState) => state.cart.total;
+export const selectCartTotal = (state: RootState) =>
+  state.cart.items.reduce(
+    (acc, item) => acc + item.price * (item.quantity || 1),
+    0
+  );
 
 // import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 

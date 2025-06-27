@@ -11,11 +11,15 @@ import cartReducer from "../reducers/cart";
 // import { apiSlice } from "../services/api/ApiSlice";
 import { apiSlicess } from "../utils/rtk";
 import authReducer from "../reducers/authSlice";
+import couponReducers from "../reducers/coupon";
+import couponReducer from "../reducers/couponSlice";
 
 const appReducer = combineReducers({
   filter: filterReducer,
   cart: cartReducer,
   auth: authReducer,
+  coupons: couponReducers,
+  coupon: couponReducer,
   // api: apiSlice.reducer,
   // api: apiSlicess.reducer,
   [apiSlicess.reducerPath]: apiSlicess.reducer,

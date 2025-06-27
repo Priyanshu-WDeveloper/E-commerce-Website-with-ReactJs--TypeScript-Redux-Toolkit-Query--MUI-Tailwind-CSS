@@ -1,9 +1,9 @@
 import { Box, Button, Typography } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useToast } from "../helpers/toasts/useToast";
 import LoadingBackdrop from "../components/Backdrop";
 import * as Sentry from "@sentry/react";
+import { errToast, showInfo, showToast, toast } from "../helpers/toast";
 
 interface Author {
   name: string;
@@ -23,7 +23,6 @@ interface AuthorData {
 const TopSellers = () => {
   const [authors, setAuthors] = useState<Author[]>([]);
   const [loading, setLoading] = useState(true);
-  const toast = useToast();
   useEffect(() => {
     try {
       (async () => {
@@ -73,11 +72,16 @@ const TopSellers = () => {
     setAuthors(updatedAuthors);
 
     // Step 3: Toast outside of state logic
-    toast(
-      !targetAuthor.isFollowing
-        ? `You followed ${targetAuthor.name}`
-        : `You unfollowed ${targetAuthor.name}`
-    );
+    if (!targetAuthor.isFollowing) {
+      showToast(`You followed ${targetAuthor.name}`);
+    } else {
+      errToast(`You unfollowed ${targetAuthor.name}`);
+    }
+    // errToast(
+    //   !targetAuthor.isFollowing
+    //     ? `You followed ${targetAuthor.name}`
+    //     : `You unfollowed ${targetAuthor.name}`
+    // );
   };
 
   // const handleFollowClick = (index: number) => {

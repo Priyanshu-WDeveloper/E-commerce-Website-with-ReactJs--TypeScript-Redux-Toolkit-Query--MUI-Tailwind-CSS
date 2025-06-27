@@ -1,97 +1,40 @@
-import { useEffect, useState } from "react";
+import * as Sentry from "@sentry/react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import {
-  Box,
-  Button,
-  Divider,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  Pagination,
-} from "@mui/material";
+import { Box, Button, Drawer, Pagination } from "@mui/material";
 import BubbleChartIcon from "@mui/icons-material/BubbleChart";
 import Bookcard from "./Bookcard";
-
 import { RootState } from "../app/store";
 import Sidebar from "./Sidebar";
-// import { useLazyGetProductDataQuery } from "../services/api/ApiSlice";
 import { Product } from "../types/productTypes";
-import {
-  // useGetCategoryListQuery,
-  // useGetProductDataQuery,
-  useLazyGetProductDataQuery,
-} from "../services/ProductData";
-// import CustomPagination from "../components/Pagination";
-// import Pagenotfound from "../components/NoProductsFound";
+import { useLazyGetProductDataQuery } from "../services/ProductData";
 import NoProductsFound from "../components/NoProductsFound";
-// import {
-//   setKeyword,
-//   setMaxPrice,
-//   setMinPrice,
-//   setSearchQuery,
-//   setSelectedCategory,
-// } from "../reducers/FilterSlice";
 import LoadingBackdrop from "../components/Backdrop";
-import * as Sentry from "@sentry/react";
+import DrawerList from "../components/DrawerList";
+import { errToast, toast } from "../helpers/toast";
 
-// interface Product {
-//     category: string;
-//     title: string;
-// }
-// interface FetchResponse {
-//     products: Product[];
-// }
-
-// export let TotalData;
 const MainContent = () => {
-  const [products, setProducts] = useState<Product[]>([]);
   const [filter, setFilter] = useState("all");
-  // const [currentPage, setCurrentPage] = useState(1);
+  const [products, setProducts] = useState<Product[]>([]);
   const [pages, setPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   // const [notification, setNotification] = useState<Product[]>([]);
-  // const [pageChange, setPageChange] = useState(1);
-  // const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-
   const [open, setOpen] = useState(false);
-  const itemPerPage = 12;
-  const toggleDrawer = (newOpen: boolean) => () => {
-    setOpen(newOpen);
-  };
-  const { searchQuery, selectedCategory, minPrice, maxPrice, keyword } =
-    useSelector((state: RootState) => state.filter);
-  // const { data, isLoading, error } = useGetSimpleDataQuery();
 
   const [getProduct] = useLazyGetProductDataQuery();
-  // const [trigger, ress] = useLazyGetSimpleDataQuery();
-  // if (!isLoading && data) {
-  // console.log(data);
-  // }
-  // const limmiter = 10;
-  // const skipp = 0;
+  const { searchQuery, selectedCategory, minPrice, maxPrice, keyword } =
+    useSelector((state: RootState) => state.filter);
 
-  // const {
-  //   data: categoriesNewData,
-  //   isLoading: isNewCategoriesLoading,
-  //   isError: isNewCategoriesError,
-  //   error,
-  // } = useGetProductDataQuery({ limit: limmiter, skip: skipp });
-
-  // Debug information
-  // console.log("categoriesNewData:", categoriesNewData);
-  // console.log("isLoading:", isNewCategoriesLoading);
-  // console.log("isError:", isNewCategoriesError);
-  // console.log("error:", error);
+  const itemPerPage = 12;
   const limit = itemPerPage;
-  // const skip = (currentPage - 1) * limit;
   const skip = (pages - 1) * limit;
   const sort = "title";
   const order = "asc";
   // const skip = (currentPage - 1) * limit;
   // const category = selectedCategory;
-  // console.log("data", data);
+  const isMounted = useRef(true);
+
   const getProductData = async () => {
     setIsLoading(true);
     try {
@@ -107,29 +50,45 @@ const MainContent = () => {
         params.sort = sort;
         params.order = order;
       }
-
       // const result = await getProduct({ limit, skip, sort, order });
-
       const result = await getProduct(params); //unwrap() is a helper method provided by RTK Query's mutation and query hooks (like useLazyGetProductDataQuery) only on the promise returned by the trigger function (not on the result object itself).
-
-      setProducts(result?.data?.products || []);
-      setTotalItems(result?.data?.total || 0);
-      // setNotification(result?.data?.products || []);
-      // console.log("Products:", notification);
+      // console.log(result);
+      if (isMounted.current && result && result.data?.statusCode === 200) {
+        setProducts(result.data.data?.products || []);
+        setTotalItems(result.data.data?.total || 0);
+        // setNotification(result?.data?.products || []);
+        // console.log("Products:", notification);
+      } else {
+        setProducts([]);
+        setTotalItems(0);
+        // showToast("Error fetching products", "error");
+        errToast("Error fetching products");
+        setIsLoading(false);
+      }
       setIsLoading(false);
+      if (isMounted.current) setIsLoading(false);
     } catch (error) {
       // console.error("Error fetching products:", error);
       if (import.meta.env.MODE !== "development") {
         Sentry.captureException(error);
       } else {
-        console.error("Caught error:", error);
+        console.log(" Error fetching products");
+
+        console.error("Caughttt errorrrr:", error);
       }
       // setProducts([]);
     }
   };
 
   useEffect(() => {
+    isMounted.current = true;
+    // if (isMounted) {
+    //   getProductData();
+    // }
     getProductData();
+    return () => {
+      isMounted.current = false; // Cleanup function to avoid memory leaks
+    };
   }, [limit, skip, selectedCategory, keyword, sort, order]);
   // useEffect(() => {
   //   if (selectedCategory) {
@@ -193,103 +152,20 @@ const MainContent = () => {
   const filteredProducts = getFilteredProducts();
   // console.log(filteredProducts);
 
-  // const totalProducts = 100;
   const totalPages = Math.ceil(totalItems / itemPerPage);
-  // const totalPages = Math.ceil(totalProducts / itemPerPage);
-  // const totalPages = Math.ceil(TotalData / itemPerPage);
-
-  // const onPageChange = (newPage: number) => {
-  //   setPageChange(newPage);
-  // };
   const handlePageChanges = (_: React.ChangeEvent<unknown>, value: number) => {
     setPages(value);
   };
-  // const handlePageChange = (page: number) => {
-  //   if (page > 0 && page <= totalPages) {
-  //     setCurrentPage(page);
-  //   }
-  // };
-  // const getPaginationButton = () => {
-  //   const buttons: number[] = [];
-  //   let startPage = Math.max(1, currentPage - 2);
-  //   let endPage = Math.min(totalPages, currentPage + 2);
-  //   if (currentPage - 2 < 1) {
-  //     endPage = Math.min(totalPages, endPage + (2 - currentPage - 1));
-  //   }
-  //   if (currentPage + 2 > totalPages) {
-  //     startPage = Math.min(1, startPage - (2 - totalPages - currentPage));
-  //   }
-  //   for (let page = startPage; page <= endPage; page++) {
-  //     buttons.push(page);
-  //   }
-  //   return buttons;
-  // };
+  const toggleDrawer = (newOpen: boolean) => () => {
+    setOpen(newOpen);
+  };
 
-  // const handleResetFilters = useCallback(() => {
-  //   dispatch(setSearchQuery(""));
-  //   dispatch(setMinPrice(undefined));
-  //   dispatch(setMaxPrice(undefined));
-  //   dispatch(setKeyword(""));
-  //   dispatch(setSelectedCategory(""));
-  // }, [dispatch]);
-  const DrawerList = (
-    <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
-      <List>
-        <ListItem disablePadding>
-          <ListItemButton
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "start",
-            }}
-          >
-            {/* <ListItemIcon>
-                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                            </ListItemIcon>
-                            <ListItemText primary={text} /> */}
-            {/* <Box className=" bg-white  rounded mt-2 w-full sm:w-40 "> */}
-            <Button sx={{ color: "black" }} onClick={() => setFilter("cheap")}>
-              Cheap
-            </Button>
-            <Button
-              sx={{ color: "black" }}
-              onClick={() => setFilter("expensive")}
-            >
-              Expensive
-            </Button>
-            <Button
-              sx={{ color: "black" }}
-              onClick={() => setFilter("popular")}
-            >
-              Popular
-            </Button>
-
-            {/* </Box> */}
-          </ListItemButton>
-        </ListItem>
-      </List>
-      <Divider />
-      {/* <List>
-                    {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                        <ListItem key={text} disablePadding>
-                            <ListItemButton>
-                                <ListItemIcon>
-                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                                </ListItemIcon>
-                                <ListItemText primary={text} />
-                            </ListItemButton>
-                        </ListItem>
-                    ))}
-                </List> */}
-    </Box>
-  );
   if (isLoading) {
     return <LoadingBackdrop />;
   }
   return products.length ? (
     <>
       <Sidebar />
-
       <section className=" ml-60 w-full xl:w-[55rem] lg:w-[55rem] sm:w-[40rem] xs:w-[20rem] pt-2 ">
         {/* <Container maxWidth={"md"}> */}
         <Box className="mb-5">
@@ -309,7 +185,7 @@ const MainContent = () => {
                 Filter
               </Button>
               <Drawer open={open} onClose={toggleDrawer(false)}>
-                {DrawerList}
+                <DrawerList toggleDrawer={toggleDrawer} setFilter={setFilter} />
               </Drawer>
               {/* {
                             dropdownOpen && (
@@ -338,19 +214,7 @@ const MainContent = () => {
             {/* <Box> */}
 
             {filteredProducts.map((product) => (
-              <Bookcard
-                key={product.id}
-                // isLoading={isLoading}
-                isLoading={isLoading}
-                // id={product.id}
-                // title={product.title || ""}
-                // // image={product.images[0]}
-                // image={product.thumbnail || ""}
-                // // image={...products, thumbnail: `https://picsum.photos/seed/${product.id}/200/300`}
-                // price={product.price || 0}
-                // loading={loading}
-                data={product}
-              />
+              <Bookcard key={product.id} isLoading={isLoading} data={product} />
             ))}
           </Box>
           {/* <Box className="pt-5 flex justify-center items-center"> */}

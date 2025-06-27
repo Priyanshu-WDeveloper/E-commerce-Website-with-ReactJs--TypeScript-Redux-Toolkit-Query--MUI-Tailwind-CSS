@@ -16,13 +16,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useGetProductDataByIdQuery } from "../services/ProductData";
 import LoadingBackdrop from "../components/Backdrop";
 import { useDispatch } from "react-redux";
-import { useToast } from "../helpers/toasts/useToast";
 import { addToCart } from "../reducers/cart";
+import { showToast } from "../helpers/toast";
+import OrderButton from "../components/Buttons/OrderButton";
 
 const ProductPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const showToast = useToast();
   const dispatch = useDispatch();
 
   // const [fetchCategories] = useLazyGetCategoryListQuery();
@@ -33,6 +33,7 @@ const ProductPage = () => {
     error,
   } = useGetProductDataByIdQuery({ id } as { id: string });
   // } = useGetProductDataByIdQuery(id ?? skipToken);
+  // console.log(response);
   // console.log(response);
 
   if (isLoading) return <LoadingBackdrop />;
@@ -47,7 +48,7 @@ const ProductPage = () => {
       </Box>
     );
 
-  const product = response;
+  const product = response.data;
 
   const handleAddToCart = () => {
     showToast("Added to Cart Successfully");
@@ -146,8 +147,8 @@ const ProductPage = () => {
               />
             ))}
           </Stack>
-          <Stack>
-            <Button
+          <Stack direction="column" spacing={1} mt={2}>
+            {/* <Button
               onClick={handleAddToCart}
               sx={{
                 backgroundColor: "black",
@@ -168,8 +169,10 @@ const ProductPage = () => {
               }}
             >
               Add to Cart
-            </Button>
-            <Button
+            </Button> */}
+            <OrderButton onClick={handleAddToCart}>Add to Cart</OrderButton>
+            <OrderButton onClick={handleBuy}>Buy</OrderButton>
+            {/* <Button
               onClick={handleBuy}
               sx={{
                 backgroundColor: "black",
@@ -188,7 +191,7 @@ const ProductPage = () => {
               }}
             >
               Buy
-            </Button>
+            </Button> */}
           </Stack>
         </Grid>
 

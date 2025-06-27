@@ -24,7 +24,6 @@ const baseQuery = fetchBaseQuery({
   prepareHeaders: (headers, { getState }) => {
     const state = getState() as RootState;
     const token = state?.auth?.token;
-    // console.log("Token from state:", token);
 
     if (token) {
       headers.set("authorization", `Bearer ${token}`);
@@ -32,11 +31,7 @@ const baseQuery = fetchBaseQuery({
     return headers;
   },
 });
-// const baseQueryWithAuth: BaseQueryFn<
-//   string | FetchArgs | any,
-//   unknown,
-//   FetchBaseQueryError
-// > = async (args, api, extraOptions) => {
+
 const baseQueryWithReAuth: BaseQueryFn<
   string | FetchArgs,
   unknown,
@@ -45,9 +40,7 @@ const baseQueryWithReAuth: BaseQueryFn<
   FetchBaseQueryMeta
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
-  // console.log("result", result);
 
-  // if (result?.error?.originalStatus === 403) {  // not using this because originalStatus is not working so using status ( result?.error?.status)
   if (result?.error?.status === 403) {
     const refreshResult = (await baseQuery(
       "/refresh",
@@ -55,21 +48,14 @@ const baseQueryWithReAuth: BaseQueryFn<
       extraOptions
     )) as RefreshResponse;
 
-    // console.log("refreshResultt==========", refreshResult);
     if (refreshResult?.data && typeof refreshResult.data === "object") {
-      // data or token
-      // if (refreshResult?.data) {
       const state = api.getState() as RootState;
       const user = state?.auth?.user;
-      // console.log("state", state);
-      // console.log("user", user);
       const rememberMe = localStorage.getItem("rememberMe") === "true";
-      // console.log(rememberMe);
       const newToken = refreshResult?.data?.data?.accessToken;
 
       api.dispatch(
         setCreditionals({
-          // ...refreshResult.data,
           accessToken: newToken,
           user,
           rememberMe,
@@ -84,6 +70,7 @@ const baseQueryWithReAuth: BaseQueryFn<
   }
   return result;
 };
+
 export const apiSlicess = createApi({
   baseQuery: baseQueryWithReAuth,
   endpoints: () => ({}),

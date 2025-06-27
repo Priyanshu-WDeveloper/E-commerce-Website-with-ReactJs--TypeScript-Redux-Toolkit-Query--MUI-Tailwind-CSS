@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { CheckCircleOutline as CheckIcon } from "@mui/icons-material";
 import { useDispatch } from "react-redux";
 import { clearCart } from "../reducers/cart";
+import OrderButton from "../components/Buttons/OrderButton";
 
 const OrderConfirmation = () => {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ const OrderConfirmation = () => {
             You can track your order status from your dashboard.
           </Typography>
 
-          <Button
+          {/* <Button
             variant="contained"
             size="large"
             onClick={() => navigate("/menu")}
@@ -83,7 +84,14 @@ const OrderConfirmation = () => {
             }}
           >
             Continue Shopping
-          </Button>
+          </Button> */}
+          <OrderButton
+            variant="contained"
+            size="large"
+            onClick={() => navigate("/menu")}
+          >
+            Continue Shopping
+          </OrderButton>
         </CardContent>
       </Card>
     </Box>

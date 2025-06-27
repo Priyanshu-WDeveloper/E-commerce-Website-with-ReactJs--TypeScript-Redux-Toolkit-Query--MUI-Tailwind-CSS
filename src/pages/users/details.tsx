@@ -77,12 +77,9 @@ const UserDetails = () => {
         setUserDetailsData(response?.data);
       }
     } catch (error) {
-      setLoading(false);
-<<<<<<< HEAD
       // console.log(error);
-=======
+      setLoading(false);
       console.error(error);
->>>>>>> dev
     }
   };
 
